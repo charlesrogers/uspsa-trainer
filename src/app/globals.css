@@ -1,26 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brand-50: #fef3f2;
+  --brand-100: #fee4e2;
+  --brand-200: #fececa;
+  --brand-300: #fcb1a8;
+  --brand-400: #f78272;
+  --brand-500: #ee5a45;
+  --brand-600: #dc3d28;
+  --brand-700: #b8301e;
+  --brand-800: #982c1d;
+  --brand-900: #7f2b1f;
+  --brand-950: #451209;
+  --surface-50: #f8fafc;
+  --surface-100: #f1f5f9;
+  --surface-200: #e2e8f0;
+  --surface-300: #cbd5e1;
+  --surface-400: #94a3b8;
+  --surface-500: #64748b;
+  --surface-600: #475569;
+  --surface-700: #334155;
+  --surface-800: #1e293b;
+  --surface-900: #0f172a;
+  --surface-950: #020617;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+  --color-surface-50: var(--surface-50);
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
+  --color-surface-400: var(--surface-400);
+  --color-surface-500: var(--surface-500);
+  --color-surface-600: var(--surface-600);
+  --color-surface-700: var(--surface-700);
+  --color-surface-800: var(--surface-800);
+  --color-surface-900: var(--surface-900);
+  --color-surface-950: var(--surface-950);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--surface-50);
+  color: var(--surface-900);
+}
+
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
+.tab-btn.active {
+  background: var(--surface-800);
+  color: white;
+}
+
+.benchmark-cell {
+  transition: background 0.15s;
+}
+
+.benchmark-cell:hover {
+  background: var(--brand-50);
 }
