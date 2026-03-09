@@ -208,11 +208,11 @@ export default function DashboardPage() {
               </span>
             </div>
             {/* Drill checklist */}
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="space-y-1 mb-4">
               {assessment.drills.map((d) => (
                 <div
                   key={d.drillId}
-                  className="flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-md"
+                  className="flex items-center gap-2.5 text-xs px-2.5 py-2 rounded-md"
                   style={{
                     color: d.isComplete ? "#4ade80" : "#8b8ba0",
                     backgroundColor: d.isComplete ? "rgba(34,197,94,0.08)" : "transparent",
@@ -225,8 +225,8 @@ export default function DashboardPage() {
                   ) : (
                     <div className="w-3.5 h-3.5 flex-shrink-0 rounded-sm" style={{ border: "1px solid #6b6b80" }} />
                   )}
-                  <span className="truncate">{d.name}</span>
-                  <span className="ml-auto flex-shrink-0" style={{ color: "#6b6b80" }}>{d.why}</span>
+                  <span className="font-medium">{d.name}</span>
+                  <span className="ml-auto flex-shrink-0 text-[11px]" style={{ color: "#6b6b80" }}>{d.why}</span>
                 </div>
               ))}
             </div>
