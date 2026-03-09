@@ -45,7 +45,7 @@ export default function DrillLibraryPage() {
           placeholder="Search drills..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 bg-white border border-surface-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2.5 border border-surface-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
         />
       </div>
 
@@ -104,7 +104,7 @@ export default function DrillLibraryPage() {
             <Link
               key={drill.id}
               href={`/drills/${drill.id}`}
-              className="bg-white rounded-xl border border-surface-200 p-3 block hover:border-brand-300 transition-colors"
+              className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-3 block hover:border-brand-800 transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div>

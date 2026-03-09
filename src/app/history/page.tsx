@@ -21,7 +21,7 @@ export default function HistoryPage() {
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Session History</h1>
       {sessions.length === 0 ? (
-        <div className="bg-white rounded-xl border border-surface-200 p-6 text-center">
+        <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-6 text-center">
           <p className="text-sm text-surface-400 mb-4">No sessions recorded yet.</p>
           <Link
             href="/session"
@@ -44,7 +44,7 @@ export default function HistoryPage() {
               <Link
                 key={session.id}
                 href={isActive ? `/session/active` : `/history/${session.id}`}
-                className="bg-white rounded-xl border border-surface-200 p-3 block hover:border-brand-300"
+                className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-3 block hover:border-brand-800"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -52,7 +52,7 @@ export default function HistoryPage() {
                       {formatDate(session.startedAt)} &mdash;{" "}
                       {isLive ? "Live Fire" : "Dry Fire"}
                       {isActive && (
-                        <span className="text-xs bg-green-100 text-green-700 px-1.5 rounded ml-2">ACTIVE</span>
+                        <span className="text-xs bg-green-900/30 text-green-400 px-1.5 rounded ml-2">ACTIVE</span>
                       )}
                     </div>
                     <div className="text-xs text-surface-400">
@@ -62,7 +62,7 @@ export default function HistoryPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`text-sm font-semibold ${isLive ? "text-brand-600" : "text-blue-600"}`}>
+                    <div className={`text-sm font-semibold ${isLive ? "text-brand-600" : "text-blue-400"}`}>
                       {stats.validRuns} XP
                     </div>
                     <div className="text-xs text-surface-400">

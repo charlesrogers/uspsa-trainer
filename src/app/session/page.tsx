@@ -55,13 +55,13 @@ function NewSessionPage() {
         <div className="space-y-4">
           {/* Fire Mode */}
           <div>
-            <label className="text-sm font-medium text-surface-700 mb-2 block">Fire Mode</label>
+            <label className="text-sm font-medium text-surface-500 mb-2 block">Fire Mode</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setFireMode("live_fire")}
                 className={`border-2 font-medium py-3 rounded-xl text-sm flex items-center justify-center gap-2 ${
                   fireMode === "live_fire"
-                    ? "border-brand-600 bg-brand-50 text-brand-700"
+                    ? "border-brand-600 bg-[rgba(0,220,130,0.1)] text-brand-400"
                     : "border-surface-200 text-surface-600 hover:border-surface-300"
                 }`}
               >
@@ -74,7 +74,7 @@ function NewSessionPage() {
                 onClick={() => setFireMode("dry_fire")}
                 className={`border-2 font-medium py-3 rounded-xl text-sm flex items-center justify-center gap-2 ${
                   fireMode === "dry_fire"
-                    ? "border-brand-600 bg-brand-50 text-brand-700"
+                    ? "border-brand-600 bg-[rgba(0,220,130,0.1)] text-brand-400"
                     : "border-surface-200 text-surface-600 hover:border-surface-300"
                 }`}
               >
@@ -88,7 +88,7 @@ function NewSessionPage() {
 
           {/* Location */}
           <div>
-            <label className="text-sm font-medium text-surface-700 mb-2 block">
+            <label className="text-sm font-medium text-surface-500 mb-2 block">
               Location <span className="text-surface-400 font-normal">(optional)</span>
             </label>
             <input
@@ -96,22 +96,22 @@ function NewSessionPage() {
               placeholder="e.g., Outdoor Range, Home"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-surface-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-surface-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
           {/* Timer */}
           <div>
-            <label className="text-sm font-medium text-surface-700 mb-2 block">Shot Timer</label>
+            <label className="text-sm font-medium text-surface-500 mb-2 block">Shot Timer</label>
             <div className={`rounded-xl p-3 flex items-center justify-between ${
-              ble.isConnected ? "bg-green-50 border border-green-200" : "bg-surface-100"
+              ble.isConnected ? "bg-green-900/20 border border-green-800" : "bg-surface-100"
             }`}>
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  ble.isConnected ? "bg-green-200" : "bg-surface-200"
+                  ble.isConnected ? "bg-green-900/40" : "bg-surface-200"
                 }`}>
                   {ble.isConnected ? (
-                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
                     </svg>
                   ) : (
@@ -123,8 +123,8 @@ function NewSessionPage() {
                 <div>
                   {ble.isConnected ? (
                     <>
-                      <div className="text-sm font-medium text-green-700">{ble.deviceName}</div>
-                      <div className="text-xs text-green-600">Connected — times auto-populate</div>
+                      <div className="text-sm font-medium text-green-400">{ble.deviceName}</div>
+                      <div className="text-xs text-green-400">Connected — times auto-populate</div>
                     </>
                   ) : ble.state === "scanning" || ble.state === "connecting" ? (
                     <>
@@ -148,7 +148,7 @@ function NewSessionPage() {
               {ble.isConnected ? (
                 <button
                   onClick={() => ble.disconnect()}
-                  className="text-xs text-green-600 font-medium hover:text-green-800"
+                  className="text-xs text-green-400 font-medium hover:text-green-300"
                 >
                   Disconnect
                 </button>
@@ -169,14 +169,14 @@ function NewSessionPage() {
 
           {/* Notes */}
           <div>
-            <label className="text-sm font-medium text-surface-700 mb-2 block">
+            <label className="text-sm font-medium text-surface-500 mb-2 block">
               Notes <span className="text-surface-400 font-normal">(optional)</span>
             </label>
             <textarea
               placeholder="Weather, gear changes, focus areas..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-surface-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 h-20 resize-none"
+              className="w-full px-3 py-2.5 border border-surface-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 h-20 resize-none"
             />
           </div>
         </div>

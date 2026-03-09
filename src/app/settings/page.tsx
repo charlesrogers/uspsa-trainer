@@ -61,7 +61,7 @@ export default function SettingsPage() {
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Profile & Settings</h1>
 
-      <div className="bg-white rounded-xl border border-surface-200 p-4 mb-4">
+      <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
         {/* Avatar */}
         <div className="flex items-center gap-4 mb-4">
           <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center text-xl font-bold text-surface-500">
@@ -97,7 +97,7 @@ export default function SettingsPage() {
             <select
               value={profile.classification}
               onChange={(e) => update("classification", e.target.value)}
-              className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm"
             >
               {classifications.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -115,7 +115,7 @@ export default function SettingsPage() {
             <select
               value={profile.targetClassification}
               onChange={(e) => update("targetClassification", e.target.value)}
-              className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm"
             >
               {targetClassifications.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
             <select
               value={profile.division}
               onChange={(e) => update("division", e.target.value)}
-              className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm"
             >
               {divisions.map((d) => (
                 <option key={d} value={d}>
@@ -149,7 +149,7 @@ export default function SettingsPage() {
               value={profile.equipment}
               onChange={(e) => update("equipment", e.target.value)}
               placeholder="e.g., CZ Shadow 2, CompTac holster"
-              className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm"
             />
           </div>
 
@@ -201,22 +201,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Timer Settings */}
-      <div className="bg-white rounded-xl border border-surface-200 p-4 mb-4">
+      <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
         <h3 className="font-semibold mb-3">Shot Timer</h3>
         <div className="flex items-center justify-between p-3 bg-surface-50 rounded-lg">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              ble.isConnected ? "bg-green-100" : "bg-surface-200"
+              ble.isConnected ? "bg-green-900/40" : "bg-surface-200"
             }`}>
-              <svg className={`w-5 h-5 ${ble.isConnected ? "text-green-600" : "text-surface-400"}`} fill="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-5 h-5 ${ble.isConnected ? "text-green-400" : "text-surface-400"}`} fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
               </svg>
             </div>
             <div>
               {ble.isConnected ? (
                 <>
-                  <div className="text-sm font-medium text-green-700">{ble.deviceName}</div>
-                  <div className="text-xs text-green-600">Connected</div>
+                  <div className="text-sm font-medium text-green-400">{ble.deviceName}</div>
+                  <div className="text-xs text-green-400">Connected</div>
                 </>
               ) : ble.state === "scanning" || ble.state === "connecting" ? (
                 <>
@@ -238,7 +238,7 @@ export default function SettingsPage() {
           {ble.isConnected ? (
             <button
               onClick={() => ble.disconnect()}
-              className="text-sm text-red-600 font-medium bg-red-50 px-3 py-1.5 rounded-lg"
+              className="text-sm text-red-400 font-medium bg-red-900/30 px-3 py-1.5 rounded-lg"
             >
               Disconnect
             </button>
@@ -246,7 +246,7 @@ export default function SettingsPage() {
             <button
               onClick={() => ble.scanAndConnect()}
               disabled={ble.state === "scanning" || ble.state === "connecting"}
-              className="text-sm text-brand-600 font-medium bg-brand-50 px-3 py-1.5 rounded-lg disabled:opacity-50"
+              className="text-sm text-brand-400 font-medium bg-brand-900/30 px-3 py-1.5 rounded-lg disabled:opacity-50"
             >
               {ble.state === "scanning" || ble.state === "connecting" ? "..." : "Scan"}
             </button>
@@ -256,14 +256,14 @@ export default function SettingsPage() {
           <p className="text-xs text-red-500 mt-2">{ble.error}</p>
         )}
         {!ble.isSupported && (
-          <p className="text-xs text-amber-600 mt-2">
+          <p className="text-xs text-amber-400 mt-2">
             Web Bluetooth not available. Use Chrome on Android or desktop with flags enabled.
           </p>
         )}
       </div>
 
       {/* Data */}
-      <div className="bg-white rounded-xl border border-surface-200 p-4 mb-4">
+      <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
         <h3 className="font-semibold mb-3">Data</h3>
         <div className="space-y-2">
           <button
@@ -281,7 +281,7 @@ export default function SettingsPage() {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="w-full text-left px-3 py-2 hover:bg-surface-50 rounded-lg text-sm flex items-center justify-between"
+            className="w-full text-left px-3 py-2 hover:bg-[var(--bg-elevated)] rounded-lg text-sm flex items-center justify-between"
           >
             <span>Export all data (JSON)</span>
             <svg className="w-4 h-4 text-surface-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -299,8 +299,8 @@ export default function SettingsPage() {
         onClick={handleSave}
         className={`w-full py-2 text-sm font-medium rounded-xl transition-colors ${
           saved
-            ? "bg-green-100 text-green-700"
-            : "text-brand-600 hover:bg-brand-50"
+            ? "bg-green-900/30 text-green-400"
+            : "text-brand-400 hover:bg-brand-900/20"
         }`}
       >
         {saved ? "Saved!" : "Save Changes"}

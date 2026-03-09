@@ -20,8 +20,8 @@ export default function ConstraintSelector({ constraints, onChange, compact }: P
           onClick={() => update("fireMode", constraints.fireMode === "live_fire" ? "dry_fire" : "live_fire")}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
             constraints.fireMode === "live_fire"
-              ? "bg-red-100 text-red-700"
-              : "bg-blue-100 text-blue-700"
+              ? "bg-red-900/30 text-red-400"
+              : "bg-blue-900/30 text-blue-400"
           }`}
         >
           {constraints.fireMode === "live_fire" ? "Live Fire" : "Dry Fire"}
@@ -40,7 +40,7 @@ export default function ConstraintSelector({ constraints, onChange, compact }: P
           onClick={() => update("movementAvailable", !constraints.movementAvailable)}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
             constraints.movementAvailable
-              ? "bg-green-100 text-green-700"
+              ? "bg-green-900/30 text-green-400"
               : "bg-surface-100 text-surface-400 line-through"
           }`}
         >

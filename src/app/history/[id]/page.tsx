@@ -91,26 +91,26 @@ export default function SessionDetailPage() {
 
         {/* Stats grid */}
         <div className="grid grid-cols-4 gap-2 mb-4">
-          <div className="bg-white rounded-xl border border-surface-200 p-2 text-center">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-2 text-center">
             <div className="text-lg font-bold">{stats.totalRuns}</div>
             <div className="text-xs text-surface-400">Runs</div>
           </div>
-          <div className="bg-white rounded-xl border border-surface-200 p-2 text-center">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-2 text-center">
             <div className="text-lg font-bold">{stats.validRuns}</div>
             <div className="text-xs text-surface-400">Valid</div>
           </div>
-          <div className="bg-white rounded-xl border border-surface-200 p-2 text-center">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-2 text-center">
             <div className="text-lg font-bold">{stats.totalRounds}</div>
             <div className="text-xs text-surface-400">Rounds</div>
           </div>
-          <div className="bg-white rounded-xl border border-surface-200 p-2 text-center">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-2 text-center">
             <div className="text-lg font-bold">{stats.drillCount}</div>
             <div className="text-xs text-surface-400">Drills</div>
           </div>
         </div>
 
         {/* Run breakdown */}
-        <div className="bg-white rounded-xl border border-surface-200 divide-y divide-surface-100 mb-4">
+        <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 divide-y divide-surface-200 mb-4">
           {runs.map((run) => {
             const drill = getDrill(run.drillId);
             const pct = run.isValid
@@ -132,10 +132,10 @@ export default function SessionDetailPage() {
                     </span>
                     <span className="text-xs text-surface-400 ml-1">@ {run.distanceYards}yd</span>
                     {run.isCold && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-1 rounded ml-1">COLD</span>
+                      <span className="text-xs bg-blue-900/30 text-blue-400 px-1 rounded ml-1">COLD</span>
                     )}
                     {!run.isValid && (
-                      <span className="text-xs bg-red-100 text-red-700 px-1 rounded ml-1">INVALID</span>
+                      <span className="text-xs bg-red-900/30 text-red-400 px-1 rounded ml-1">INVALID</span>
                     )}
                   </div>
                   <div className="text-right">
@@ -173,12 +173,12 @@ export default function SessionDetailPage() {
 
         {/* Cold vs Warm */}
         {coldRun && bestWarm && (
-          <div className="bg-white rounded-xl border border-surface-200 p-4 mb-4">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
             <h3 className="font-semibold text-sm mb-2">Cold vs. Warm</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-xs text-surface-400 mb-1">Cold (1st run)</div>
-                <div className="font-mono text-xl font-bold text-blue-600">
+                <div className="font-mono text-xl font-bold text-blue-400">
                   {formatTime(coldRun.totalTime)}s
                 </div>
                 <div className="text-xs text-surface-500">
@@ -187,7 +187,7 @@ export default function SessionDetailPage() {
               </div>
               <div className="text-center">
                 <div className="text-xs text-surface-400 mb-1">Warm (best)</div>
-                <div className="font-mono text-xl font-bold text-green-600">
+                <div className="font-mono text-xl font-bold text-green-400">
                   {formatTime(bestWarm.totalTime)}s
                 </div>
                 <div className="text-xs text-surface-500">
@@ -201,10 +201,10 @@ export default function SessionDetailPage() {
                 <span
                   className={`text-sm font-semibold ml-1 ${
                     parseInt(ownership) >= 97
-                      ? "text-green-600"
+                      ? "text-green-400"
                       : parseInt(ownership) >= 92
-                      ? "text-yellow-600"
-                      : "text-red-600"
+                      ? "text-yellow-400"
+                      : "text-red-400"
                   }`}
                 >
                   {ownership}% ({formatTime(bestWarm.totalTime)} / {formatTime(coldRun.totalTime)})
@@ -219,7 +219,7 @@ export default function SessionDetailPage() {
 
         {/* Session notes */}
         {session.notes && (
-          <div className="bg-white rounded-xl border border-surface-200 p-4 mb-4">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
             <h3 className="font-semibold text-sm mb-2">Notes</h3>
             <p className="text-sm text-surface-600">{session.notes}</p>
           </div>

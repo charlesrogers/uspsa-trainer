@@ -220,11 +220,11 @@ function ActiveSessionPage() {
   return (
     <div>
       {/* Session header */}
-      <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between">
+      <div className="bg-[rgba(0,220,130,0.15)] text-surface-900 border-b border-green-900 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
           <span className="text-sm font-medium">Session Active</span>
-          <span className="text-xs text-green-200">
+          <span className="text-xs text-green-400">
             · {session.fireMode === "live_fire" ? "Live Fire" : "Dry Fire"} · {elapsed} min
           </span>
         </div>
@@ -232,7 +232,7 @@ function ActiveSessionPage() {
           {!ble.isConnected && ble.isSupported && (
             <button
               onClick={() => ble.scanAndConnect()}
-              className="text-xs bg-green-700 hover:bg-green-800 px-2 py-1 rounded-lg font-medium flex items-center gap-1"
+              className="text-xs bg-green-900/40 hover:bg-green-900/60 px-2 py-1 rounded-lg font-medium flex items-center gap-1"
             >
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
@@ -242,7 +242,7 @@ function ActiveSessionPage() {
           )}
           <button
             onClick={handleEndSession}
-            className="text-xs bg-green-700 hover:bg-green-800 px-3 py-1 rounded-lg font-medium"
+            className="text-xs bg-green-900/40 hover:bg-green-900/60 px-3 py-1 rounded-lg font-medium"
           >
             End Session
           </button>
@@ -272,7 +272,7 @@ function ActiveSessionPage() {
                 return (
                   <div
                     key={run.id}
-                    className={`bg-white rounded-xl border border-surface-200 p-3 ${
+                    className={`bg-[var(--bg-card)] rounded-xl border border-surface-200 p-3 ${
                       !run.isValid ? "opacity-50" : ""
                     }`}
                   >
@@ -283,10 +283,10 @@ function ActiveSessionPage() {
                         </span>
                         <span className="text-xs text-surface-400 ml-1">@ {run.distanceYards}yd</span>
                         {run.isCold && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-1 rounded ml-1">COLD</span>
+                          <span className="text-xs bg-blue-900/30 text-blue-400 px-1 rounded ml-1">COLD</span>
                         )}
                         {!run.isValid && (
-                          <span className="text-xs bg-red-100 text-red-700 px-1 rounded ml-1">INVALID</span>
+                          <span className="text-xs bg-red-900/30 text-red-400 px-1 rounded ml-1">INVALID</span>
                         )}
                       </div>
                       <div className="text-right">
@@ -334,11 +334,11 @@ function ActiveSessionPage() {
         )}
 
         {/* New Run Entry */}
-        <div className="bg-white rounded-xl border-2 border-brand-200 p-4 mb-4">
+        <div className="bg-[var(--bg-card)] rounded-xl border-2 border-brand-900 p-4 mb-4">
           <h3 className="font-semibold mb-3 flex items-center justify-between">
             <span>Log Run #{runs.length + 1}</span>
             {detectCold() && (
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">COLD RUN</span>
+              <span className="text-xs bg-blue-900/30 text-blue-400 px-2 py-0.5 rounded">COLD RUN</span>
             )}
           </h3>
 
@@ -348,7 +348,7 @@ function ActiveSessionPage() {
             <select
               value={selectedDrillId}
               onChange={(e) => setSelectedDrillId(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               {drills.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -360,7 +360,7 @@ function ActiveSessionPage() {
 
           {/* Drill description & setup */}
           {selectedDrill && (
-            <div className="mb-3 bg-surface-50 rounded-lg p-3 text-xs text-surface-600 space-y-1.5">
+            <div className="mb-3 bg-[var(--bg-elevated)] rounded-lg p-3 text-xs text-surface-600 space-y-1.5">
               <p>{selectedDrill.description}</p>
               <p className="text-surface-500 font-medium">Setup: {selectedDrill.setupInstructions}</p>
               <div className="flex gap-3 text-surface-400">
@@ -395,11 +395,11 @@ function ActiveSessionPage() {
 
           {/* BLE Timer Controls */}
           {ble.isConnected && (
-            <div className="mb-3 bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="mb-3 bg-green-900/20 border border-green-800 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${ble.timerRunning || timerWaiting ? "bg-orange-500 animate-pulse" : "bg-green-500"}`} />
-                  <span className="text-xs font-medium text-green-700">{ble.deviceName}</span>
+                  <span className="text-xs font-medium text-green-400">{ble.deviceName}</span>
                 </div>
                 {(timerWaiting || ble.timerRunning) && (
                   <button
@@ -433,7 +433,7 @@ function ActiveSessionPage() {
                   </button>
                   <button
                     onClick={() => ble.requestShotData()}
-                    className="px-3 py-2.5 bg-green-100 hover:bg-green-200 text-green-700 font-medium rounded-lg transition-colors text-sm"
+                    className="px-3 py-2.5 bg-green-900/30 hover:bg-green-900/50 text-green-400 font-medium rounded-lg transition-colors text-sm"
                     title="Pull last shot string from timer"
                   >
                     Pull Last String
@@ -456,7 +456,7 @@ function ActiveSessionPage() {
                   placeholder="0.00"
                   value={totalTime}
                   onChange={(e) => setTotalTime(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-surface-400">sec</span>
               </div>
@@ -470,7 +470,7 @@ function ActiveSessionPage() {
                   placeholder="0.00"
                   value={firstShotTime}
                   onChange={(e) => setFirstShotTime(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-surface-400">sec</span>
               </div>
@@ -487,7 +487,7 @@ function ActiveSessionPage() {
               placeholder="e.g., .26, .29, .27, .30, .28"
               value={splitsInput}
               onChange={(e) => setSplitsInput(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 bg-[var(--bg-input)] border border-surface-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -498,7 +498,7 @@ function ActiveSessionPage() {
                 Call Quality <span className="text-surface-400 font-normal">— acceptable sight pictures at break</span>
               </label>
               <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center gap-1.5 bg-surface-50 border border-surface-200 rounded-lg px-3 py-2">
+                <div className="flex-1 flex items-center gap-1.5 bg-[var(--bg-input)] border border-surface-200 rounded-lg px-3 py-2">
                   <input
                     type="number"
                     min="0"
@@ -551,7 +551,7 @@ function ActiveSessionPage() {
                     className={`flex-1 py-2 rounded-lg text-sm font-medium ${
                       pointsDown === opt.value && customPtsDown === ""
                         ? opt.value === 0
-                          ? "bg-green-100 text-green-700 border-2 border-green-300"
+                          ? "bg-green-900/30 text-green-400 border-2 border-green-800"
                           : "bg-surface-800 text-white"
                         : "bg-surface-100 text-surface-600"
                     }`}
@@ -578,11 +578,11 @@ function ActiveSessionPage() {
 
           {/* Benchmark */}
           {benchmark && (
-            <div className="bg-surface-50 rounded-lg p-3 mb-4 text-center">
+            <div className="bg-[var(--bg-elevated)] rounded-lg p-3 mb-4 text-center">
               <div className="text-xs text-surface-400 mb-1">
                 {classification}-class benchmark @ {selectedDistance}yd
               </div>
-              <div className="font-mono text-lg font-bold text-surface-700">
+              <div className="font-mono text-lg font-bold text-surface-800">
                 {formatTime(benchmark.targetTime)}s
               </div>
             </div>

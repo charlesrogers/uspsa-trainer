@@ -95,7 +95,7 @@ export default function DrillDetailPage() {
         </p>
 
         {/* Setup */}
-        <div className="bg-white rounded-xl border border-surface-200 p-4 mb-3">
+        <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-3">
           <h3 className="font-semibold text-sm mb-2">Setup</h3>
           <div className="grid grid-cols-2 gap-y-2 text-sm">
             <div>
@@ -121,7 +121,7 @@ export default function DrillDetailPage() {
         </div>
 
         {/* Skills Tested */}
-        <div className="bg-white rounded-xl border border-surface-200 p-4 mb-3">
+        <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-3">
           <h3 className="font-semibold text-sm mb-2">Skills Tested</h3>
           <div className="flex flex-wrap gap-2">
             {skillMaps
@@ -131,19 +131,19 @@ export default function DrillDetailPage() {
                   key={sm.skillId}
                   className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg ${
                     sm.isPrimary
-                      ? "bg-brand-50 border border-brand-200"
-                      : "bg-surface-50"
+                      ? "bg-[rgba(0,220,130,0.1)] border border-brand-900"
+                      : "bg-[var(--bg-elevated)]"
                   }`}
                 >
                   <div
                     className={`w-1.5 h-1.5 rounded-full ${
-                      sm.isPrimary ? "bg-brand-700" : "bg-brand-500"
+                      sm.isPrimary ? "bg-brand-400" : "bg-brand-500"
                     }`}
                   />
-                  <span className={sm.isPrimary ? "font-medium text-brand-700" : ""}>
+                  <span className={sm.isPrimary ? "font-medium text-brand-400" : ""}>
                     {sm.skill.name}
                   </span>
-                  <span className={sm.isPrimary ? "text-brand-400" : "text-surface-400"}>
+                  <span className={sm.isPrimary ? "text-brand-500" : "text-surface-400"}>
                     ({sm.encompassingWeight})
                     {sm.isPrimary ? " PRIMARY" : ""}
                   </span>
@@ -154,20 +154,20 @@ export default function DrillDetailPage() {
 
         {/* Benchmark Table */}
         {liveBenchmarks.length > 0 && (
-          <div className="bg-white rounded-xl border border-surface-200 p-4 mb-3">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-3">
             <h3 className="font-semibold text-sm mb-3">
               Live Fire Benchmarks <span className="text-surface-400 font-normal">(seconds)</span>
             </h3>
             <div className="overflow-x-auto -mx-1">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="text-surface-400 border-b border-surface-100">
+                  <tr className="text-surface-400 border-b border-surface-200">
                     <th className="text-left py-2 px-1 font-medium">Dist</th>
                     {classes.map((cls) => (
                       <th
                         key={cls}
                         className={`text-center py-2 px-1 font-medium ${
-                          cls === classification ? "bg-brand-50 rounded-t" : ""
+                          cls === classification ? "bg-[rgba(0,220,130,0.1)] rounded-t" : ""
                         }`}
                       >
                         {cls}
@@ -191,7 +191,7 @@ export default function DrillDetailPage() {
                       : "text-surface-300";
 
                     return (
-                      <tr key={dist} className="border-b border-surface-50 benchmark-cell">
+                      <tr key={dist} className="border-b border-surface-200 benchmark-cell">
                         <td className="py-2 px-1 font-sans font-medium">{dist} yd</td>
                         {classes.map((cls) => {
                           const bm = liveBenchmarks.find(
@@ -201,7 +201,7 @@ export default function DrillDetailPage() {
                             <td
                               key={cls}
                               className={`text-center py-2 px-1 ${
-                                cls === classification ? "bg-brand-50/50" : ""
+                                cls === classification ? "bg-[rgba(0,220,130,0.05)]" : ""
                               } ${!bm ? "text-surface-300" : ""}`}
                             >
                               {bm ? bm.targetTime.toFixed(2) : "\u2014"}
@@ -227,16 +227,16 @@ export default function DrillDetailPage() {
 
         {/* Breakpoint Warning */}
         {breakpoint && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3">
+          <div className="bg-amber-900/20 border border-amber-800 rounded-xl p-4 mb-3">
             <div className="flex items-start gap-2">
-              <svg className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div>
-                <div className="font-semibold text-amber-800 text-sm">
+                <div className="font-semibold text-amber-300 text-sm">
                   Breakpoint: {breakpoint.distance} yards
                 </div>
-                <p className="text-xs text-amber-700 mt-1">
+                <p className="text-xs text-amber-400 mt-1">
                   Your {drill.name} score drops below 85% of the {classification}-class benchmark at{" "}
                   {breakpoint.distance} yards ({breakpoint.userTime.toFixed(2)}s vs.{" "}
                   {breakpoint.targetTime.toFixed(2)}s target). Focus training here.
@@ -247,7 +247,7 @@ export default function DrillDetailPage() {
         )}
 
         {/* User History */}
-        <div className="bg-white rounded-xl border border-surface-200 p-4 mb-4">
+        <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
           <h3 className="font-semibold text-sm mb-3">Your History</h3>
           {runs.length === 0 ? (
             <p className="text-sm text-surface-400">No runs recorded for this drill yet.</p>
@@ -263,14 +263,14 @@ export default function DrillDetailPage() {
                 return (
                   <div
                     key={run.id}
-                    className="flex items-center justify-between text-sm p-2 rounded-lg odd:bg-surface-50"
+                    className="flex items-center justify-between text-sm p-2 rounded-lg odd:bg-[var(--bg-elevated)]"
                   >
                     <div>
                       <div className="font-medium">
                         {formatDate(run.capturedAt)}{" "}
                         <span className="text-xs text-surface-400">@ {run.distanceYards}yd</span>
                         {run.isCold && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-1 rounded ml-1">
+                          <span className="text-xs bg-blue-900/30 text-blue-400 px-1 rounded ml-1">
                             COLD
                           </span>
                         )}

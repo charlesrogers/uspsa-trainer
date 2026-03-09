@@ -39,7 +39,7 @@ export default function DryFireDistanceCalc() {
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="w-full flex items-center gap-2 text-xs text-surface-500 hover:text-surface-700 py-2 transition-colors"
+        className="w-full flex items-center gap-2 text-xs text-surface-500 hover:text-surface-300 py-2 transition-colors"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -50,7 +50,7 @@ export default function DryFireDistanceCalc() {
   }
 
   return (
-    <div className="border-t border-surface-100 pt-3 mt-3">
+    <div className="border-t border-surface-200 pt-3 mt-3">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-xs font-semibold text-surface-500 uppercase">Distance Calculator</h4>
         <button
@@ -82,13 +82,13 @@ export default function DryFireDistanceCalc() {
       </div>
 
       {targetScale !== "full" && (
-        <p className="text-xs text-blue-600 mb-3">
+        <p className="text-xs text-blue-400 mb-3">
           {targetScale === "1/3" ? "1/3 scale: 1 foot of distance = 1 yard simulated" : "1/6 scale: 1 foot of distance = 2 yards simulated"}
         </p>
       )}
 
       {/* Distance table */}
-      <div className="bg-surface-50 rounded-lg overflow-hidden">
+      <div className="bg-[var(--bg-elevated)] rounded-lg overflow-hidden">
         <div className="grid grid-cols-2 text-xs font-semibold text-surface-500 px-3 py-2 border-b border-surface-200">
           <span>Simulated</span>
           <span className="text-right">Stand At</span>

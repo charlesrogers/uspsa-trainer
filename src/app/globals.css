@@ -1,33 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   USPSA Trainer — Premium Dark Theme Design System
+   Inspired by Robinhood / Linear
+   ============================================================ */
+
 :root {
-  --brand-50: #fef3f2;
-  --brand-100: #fee4e2;
-  --brand-200: #fececa;
-  --brand-300: #fcb1a8;
-  --brand-400: #f78272;
-  --brand-500: #ee5a45;
-  --brand-600: #dc3d28;
-  --brand-700: #b8301e;
-  --brand-800: #982c1d;
-  --brand-900: #7f2b1f;
-  --brand-950: #451209;
-  --surface-50: #f8fafc;
-  --surface-100: #f1f5f9;
-  --surface-200: #e2e8f0;
-  --surface-300: #cbd5e1;
-  --surface-400: #94a3b8;
-  --surface-500: #64748b;
-  --surface-600: #475569;
-  --surface-700: #334155;
-  --surface-800: #1e293b;
-  --surface-900: #0f172a;
-  --surface-950: #020617;
+  /* --- Accent (green, Robinhood-style) --- */
+  --brand-50:  #e6fff2;
+  --brand-100: #b3ffe0;
+  --brand-200: #80ffce;
+  --brand-300: #4dfbbb;
+  --brand-400: #1ae8a0;
+  --brand-500: #00c974;
+  --brand-600: #00dc82;
+  --brand-700: #00f08f;
+  --brand-800: #00c974;
+  --brand-900: #009955;
+  --brand-950: #005c33;
+
+  /* --- Destructive / Live-fire (red) --- */
+  --danger-400: #f87171;
+  --danger-500: #ef4444;
+  --danger-600: #dc2626;
+
+  /* --- Surface scale (dark palette) --- */
+  --surface-50:  #f0f0f5;
+  --surface-100: #1a1a25;
+  --surface-200: #2a2a38;
+  --surface-300: #3a3a4a;
+  --surface-400: #6b6b80;
+  --surface-500: #8b8ba0;
+  --surface-600: #a0a0b5;
+  --surface-700: #c5c5d5;
+  --surface-800: #e0e0ea;
+  --surface-900: #f0f0f5;
+  --surface-950: #fafafe;
+
+  /* --- Base backgrounds --- */
+  --bg-base:     #0a0a0f;
+  --bg-card:     #13131a;
+  --bg-elevated: #1c1c27;
+  --bg-input:    #15151f;
+
+  /* --- Glow / shadow tokens --- */
+  --shadow-card:     0 1px 3px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 220, 130, 0.03);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 220, 130, 0.04);
+  --shadow-glow:     0 0 20px rgba(0, 220, 130, 0.15);
+
+  /* --- Transitions --- */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ============================================================
+   Tailwind v4 Theme Bridge
+   ============================================================ */
 @theme inline {
-  --color-brand-50: var(--brand-50);
+  --color-brand-50:  var(--brand-50);
   --color-brand-100: var(--brand-100);
   --color-brand-200: var(--brand-200);
   --color-brand-300: var(--brand-300);
@@ -38,7 +70,7 @@
   --color-brand-800: var(--brand-800);
   --color-brand-900: var(--brand-900);
   --color-brand-950: var(--brand-950);
-  --color-surface-50: var(--surface-50);
+  --color-surface-50:  var(--surface-50);
   --color-surface-100: var(--surface-100);
   --color-surface-200: var(--surface-200);
   --color-surface-300: var(--surface-300);
@@ -49,27 +81,364 @@
   --color-surface-800: var(--surface-800);
   --color-surface-900: var(--surface-900);
   --color-surface-950: var(--surface-950);
+  --color-danger-400: var(--danger-400);
+  --color-danger-500: var(--danger-500);
+  --color-danger-600: var(--danger-600);
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: var(--transition-fast);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--surface-50);
-  color: var(--surface-900);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-base);
+  color: var(--surface-800);
+  min-height: 100dvh;
+  position: relative;
 }
 
-input[type=number]::-webkit-inner-spin-button {
+/* Subtle radial gradient overlay on body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0, 220, 130, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(0, 150, 255, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   Scrollbar (dark theme)
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-300);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-400);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-300) transparent;
+}
+
+/* ============================================================
+   Typography Defaults
+   ============================================================ */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--surface-950);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--surface-600);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--brand-600);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--brand-700);
+}
+
+/* ============================================================
+   Card Utility
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+.card-elevated {
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  box-shadow: var(--shadow-elevated);
+  padding: 1.25rem;
+}
+
+/* ============================================================
+   Glass Utility (frosted glass)
+   ============================================================ */
+.glass {
+  background: rgba(19, 19, 26, 0.65);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.glass-strong {
+  background: rgba(19, 19, 26, 0.82);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+/* ============================================================
+   Form Controls — Dark Theme
+   ============================================================ */
+
+/* Text inputs, selects, textareas */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="date"],
+textarea,
+select {
+  background: var(--bg-input);
+  color: var(--surface-800);
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--brand-600);
+  box-shadow: 0 0 0 2px rgba(0, 220, 130, 0.15);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--surface-400);
+}
+
+input[type="number"]::-webkit-inner-spin-button {
   opacity: 1;
 }
 
-.tab-btn.active {
-  background: var(--surface-800);
-  color: white;
+/* Select arrow override for dark backgrounds */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238b8ba0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25rem 1.25rem;
+  padding-right: 2.25rem;
 }
 
+select option {
+  background: var(--bg-elevated);
+  color: var(--surface-800);
+}
+
+/* ============================================================
+   Range Slider — Dark Theme
+   ============================================================ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--surface-200);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-600);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 0 8px rgba(0, 220, 130, 0.3);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 14px rgba(0, 220, 130, 0.45);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-600);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 0 8px rgba(0, 220, 130, 0.3);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: var(--surface-200);
+  border-radius: 999px;
+}
+
+/* ============================================================
+   Checkbox & Radio — Dark Theme
+   ============================================================ */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--brand-600);
+}
+
+/* ============================================================
+   Tab Buttons
+   ============================================================ */
+.tab-btn {
+  background: transparent;
+  color: var(--surface-500);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tab-btn:hover {
+  background: var(--surface-200);
+  color: var(--surface-700);
+}
+
+.tab-btn.active {
+  background: var(--brand-600);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(0, 220, 130, 0.25);
+}
+
+/* ============================================================
+   Benchmark Cell
+   ============================================================ */
 .benchmark-cell {
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
+  border-radius: 6px;
 }
 
 .benchmark-cell:hover {
-  background: var(--brand-50);
+  background: rgba(0, 220, 130, 0.06);
+}
+
+/* ============================================================
+   Button Utilities
+   ============================================================ */
+.btn-primary {
+  background: var(--brand-600);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  box-shadow: 0 0 12px rgba(0, 220, 130, 0.2);
+}
+
+.btn-primary:hover {
+  background: var(--brand-700);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-danger {
+  background: var(--danger-500);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-danger:hover {
+  background: var(--danger-600);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--surface-600);
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.btn-ghost:hover {
+  background: var(--surface-200);
+  color: var(--surface-800);
+  border-color: var(--surface-300);
+}
+
+/* ============================================================
+   Selection
+   ============================================================ */
+::selection {
+  background: rgba(0, 220, 130, 0.25);
+  color: #fff;
+}
+
+/* ============================================================
+   Focus Visible (keyboard accessibility)
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
 }
