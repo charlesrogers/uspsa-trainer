@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { skills, drills, drillSkillMaps } from "@/lib/store";
+import { coachingQuotes } from "@/data/seed";
 import { computeAllSkillEstimates } from "@/lib/skillEstimation";
 import type { SkillEstimate } from "@/lib/skillEstimation";
 import type { Skill } from "@/data/seed";
@@ -796,6 +797,49 @@ export default function KnowledgeGraphPage() {
                 </div>
               </div>
             )}
+
+            {/* Coaching Quotes */}
+            {(() => {
+              const quotes = coachingQuotes.filter(
+                (q) => q.targetId === selectedNode.skill.id
+              );
+              if (quotes.length === 0) return null;
+              return (
+                <div>
+                  <h3
+                    className="text-xs font-semibold uppercase tracking-wider mb-2"
+                    style={{ color: "#6b6b80" }}
+                  >
+                    Coaching ({quotes.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {quotes.slice(0, 4).map((q, i) => (
+                      <div
+                        key={i}
+                        className="rounded-md p-2.5 text-[11px] leading-relaxed"
+                        style={{
+                          background: "var(--bg-elevated)",
+                          borderLeft: "2px solid rgba(0,220,130,0.3)",
+                        }}
+                      >
+                        <p style={{ color: "#c5c5d5" }}>&ldquo;{q.quote}&rdquo;</p>
+                        <p
+                          className="mt-1 text-[10px]"
+                          style={{ color: "#6b6b80" }}
+                        >
+                          — {q.source === "SDR"
+                            ? "Skills & Drills Reloaded"
+                            : q.source === "DFR"
+                            ? "Dry Fire Reloaded"
+                            : "Practical Shooting Training"}
+                          {q.context && ` · ${q.context}`}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Legend */}
             <div

@@ -15,6 +15,7 @@ import {
   computeClassificationPct,
 } from "@/lib/store";
 import type { SessionRun } from "@/lib/store";
+import { coachingQuotes } from "@/data/seed";
 import { categoryColor, categoryLabel, formatDate, formatTime, pctColor } from "@/lib/utils";
 
 export default function DrillDetailPage() {
@@ -118,6 +119,36 @@ export default function DrillDetailPage() {
             </div>
           </div>
           <p className="text-sm text-surface-600 mt-3">{drill.description}</p>
+
+          {/* Coaching Quotes */}
+          {(() => {
+            const quotes = coachingQuotes.filter((q) => q.targetId === id);
+            if (quotes.length === 0) return null;
+            return (
+              <div className="mt-3 space-y-2">
+                {quotes.map((q, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg p-3 text-xs leading-relaxed"
+                    style={{
+                      background: "var(--bg-elevated)",
+                      borderLeft: "2px solid rgba(0,220,130,0.3)",
+                    }}
+                  >
+                    <p style={{ color: "#c5c5d5" }}>&ldquo;{q.quote}&rdquo;</p>
+                    <p className="mt-1 text-[10px]" style={{ color: "#6b6b80" }}>
+                      — {q.source === "SDR"
+                        ? "Skills & Drills Reloaded"
+                        : q.source === "DFR"
+                        ? "Dry Fire Reloaded"
+                        : "Practical Shooting Training"}
+                      {q.context && ` · ${q.context}`}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Skills Tested */}
