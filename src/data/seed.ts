@@ -1697,4 +1697,200 @@ export const coachingQuotes: CoachingQuote[] = [
   { targetId: "dr-mock-stage", quote: "The way you shoot, your style, your inclinations and your habits are what you are assessing. You are not trying to accomplish anything specific. The larger goal is to see what happens and spot the 'big picture' trends.", source: "PST", context: "Mock Stage Training tips" },
   { targetId: "dr-confirmation", quote: "Learning how much 'perfect' sight picture you can trade away in order to go faster is one of the most important things that a practical shooter can do.", source: "PST", context: "Confirmation Drill tips" },
   { targetId: "dr-soft-stops", quote: "Have your feet stop momentarily but have your body continue moving. Simply stopping your feet in place for a moment and allowing yourself to continue moving will feel strange at first.", source: "PST", context: "Soft Stops drill" },
+
+  // ══════════════════════════════════════════
+  // COMPLETE COVERAGE: Sub-skill quotes
+  // Every skill node in the knowledge graph
+  // ══════════════════════════════════════════
+
+  // ── sk-draw-grip: Grip Establishment ──
+  { targetId: "sk-draw-grip", quote: "When you draw the gun from the holster, you get the same grip every time. You can't work with an inconsistent grip in live-fire. It just isn't going to do the job.", source: "DFR", context: "Minimum standards" },
+  { targetId: "sk-draw-grip", quote: "Conventionally, you get a firing grip on your pistol while it is in the holster and pull it out and present it to the target.", source: "PST", context: "Technical Hitches" },
+  { targetId: "sk-draw-grip", quote: "If you miss your grip, you will have a hard time doing well on the drill. You may have to adjust your grip when you are already on target, or shoot slowly as you fight to keep your sights in the center.", source: "SDR", context: "Bill Drill" },
+
+  // ── sk-draw-speed: Presentation Speed ──
+  { targetId: "sk-draw-speed", quote: "It takes many people only a couple weeks to develop an extremely fast draw, but the first step of that process is deciding they are going to chase the goal time.", source: "DFR", context: "Par time discussion" },
+  { targetId: "sk-draw-speed", quote: "Make sure you are getting your dry draw time down to 1 second (L2) / .8 seconds (L3) / .7 seconds (L4). You will need this speed to accomplish the live training standard times.", source: "PST", context: "Dryfire Training standards" },
+
+  // ── sk-draw-first: First Shot ──
+  { targetId: "sk-draw-first", quote: "A good rule of thumb: most people have a total time on Bill Drills that is about double their draw time. If the draw reads 1.59s, the total time will usually be about 3.2s.", source: "SDR", context: "Bill Drill analysis" },
+  { targetId: "sk-draw-first", quote: "I get a good grip on my pistol, push up to the target, and when I see my front fiber visible through the rear notch, I cut loose and start shooting.", source: "SDR", context: "Doubles at 7 yards" },
+
+  // ── sk-grip-strength: Initial Grip Strength ──
+  { targetId: "sk-grip-strength", quote: "When the gun comes up onto the target you want a 'crush' grip on the gun. Your non-dominant hand should be giving 100% of available grip strength and should be positioned properly on the gun.", source: "DFR", context: "Draw elements" },
+  { targetId: "sk-grip-strength", quote: "When you are firing a gun, it is productive to grip the gun pretty hard. Opinions vary on how hard and with which hand, but there isn't much disagreement that you should grip the gun pretty hard.", source: "DFR", context: "Tension discussion" },
+  { targetId: "sk-grip-strength", quote: "I get the best trigger speed if I don't crush down that hard with my strong hand, but with my weak hand I get better control if I crank down on the gun.", source: "SDR", context: "5-yard Bill Drill" },
+
+  // ── sk-grip-recoil: Grip Consistency Under Recoil ──
+  { targetId: "sk-grip-recoil", quote: "Instead of trying to stop the gun from moving, ensure that the gun is returning to the same spot. Let the gun track up and down in recoil and see if it is a predictable pattern.", source: "PST", context: "Recoil management" },
+  { targetId: "sk-grip-recoil", quote: "When you dry-fire, it is very tempting to use a loose grip on the gun. There is no recoil to manage, so there is no immediate incentive to grip the crap out of the gun.", source: "DFR", context: "Tension points" },
+  { targetId: "sk-grip-recoil", quote: "If you have a nice consistent grip, the gun will aim wherever you look — especially at close ranges. If you miss your grip on the pistol, it will likely end up pointing slightly in the wrong direction.", source: "SDR", context: "Target transitions" },
+
+  // ── sk-grip-support: Support Hand Engagement ──
+  { targetId: "sk-grip-support", quote: "It is better to hold the gun tightly and do a lot of the recoil management with your support hand, but that requires that you be using different amounts of pressure with each hand. It takes time and training to perfect this skill.", source: "PST", context: "Tension problems" },
+  { targetId: "sk-grip-support", quote: "High hits generally come from insufficient support hand pressure or from shifting your vision onto the sights themselves instead of the target.", source: "PST", context: "Practical Accuracy cues" },
+
+  // ── sk-trigger-press: Trigger Press ──
+  { targetId: "sk-trigger-press", quote: "You must be able to pull the trigger straight to the rear, without disturbing the sight alignment.", source: "DFR", context: "Minimum dry-fire standards" },
+  { targetId: "sk-trigger-press", quote: "Focus on putting pressure on the trigger and directing the pressure straight back into the frame of the gun. If you can do that consistently, you will be well on your way to good shooting.", source: "DFR", context: "Trigger technique" },
+  { targetId: "sk-trigger-press", quote: "Try applying pressure slowly and continually until the trigger breaks opposed to going NOW on the trigger. Fight the urge to apply all four or five pounds of pressure instantly when you get the sights where you want them.", source: "PST", context: "Group Shooting corrections" },
+
+  // ── sk-trigger-reset: Trigger Reset ──
+  { targetId: "sk-trigger-reset", quote: "'Trigger Freeze' (the inability to reset the trigger for a second shot) is caused by an over tense firing hand in almost all cases.", source: "PST", context: "Pairs drill cues" },
+  { targetId: "sk-trigger-reset", quote: "When people are fighting recoil, the tendency is to press hard, so you want to simulate that tendency during dry-fire and learn to press the trigger straight.", source: "DFR", context: "Dead trigger technique" },
+
+  // ── sk-sight-pickup: Visual Pickup Speed ──
+  { targetId: "sk-sight-pickup", quote: "You want to see the sights come up and settle into the center of the target. You don't want to see the sight come down onto the target from above — that means the gun went over the target. It is a waste of energy to bring the gun up only to bring it down again.", source: "DFR", context: "Draw sight picture" },
+  { targetId: "sk-sight-pickup", quote: "You need to be able to look at any given spot, then draw the pistol and aim at that spot while having the sights show up in near perfect alignment. This is referred to as 'index' or 'natural point of aim.'", source: "DFR", context: "Minimum standards" },
+  { targetId: "sk-sight-pickup", quote: "It is good to see the sights move on the target. It is important to have to drive the sights back to the target. Without these things happening, your training is missing that 'reality check' you get from live-fire.", source: "SDR", context: "Live-fire importance" },
+
+  // ── sk-sight-track: Sight Tracking ──
+  { targetId: "sk-sight-track", quote: "Watching your front sight move up in recoil, then using your hand muscles to return the sight, then breaking the next shot is a cycle that you go through time after time.", source: "SDR", context: "Bill Drill" },
+  { targetId: "sk-sight-track", quote: "You see the front sight or dot return back down to the center of the target before firing your second shot. This is 'reactive' to your sights.", source: "PST", context: "Reactive Shooting definition" },
+  { targetId: "sk-sight-track", quote: "You should be seeing how well you are gripping the gun during your training. Making sure the trigger is pulled straight. You should see how the sights move.", source: "DFR", context: "Live-fire observation" },
+
+  // ── sk-recoil-return: Muzzle Return to Zero ──
+  { targetId: "sk-recoil-return", quote: "If the gun is not returning to your point of aim as quickly as it normally does, resist the temptation to force that to happen. It is quite common for shooters to aggressively over-return the gun back to the target and induce even more errors.", source: "PST", context: "Special Challenges" },
+  { targetId: "sk-recoil-return", quote: "Press the trigger again as soon as your sight returns from recoil and stabilizes in the center of the A zone. You shoot the speed of your sights; no faster and no slower.", source: "SDR", context: "Practical Accuracy" },
+
+  // ── sk-dot-track: Dot Tracking ──
+  { targetId: "sk-dot-track", quote: "Most shooters using a red dot know they are supposed to focus on the target. Dot shooters may notice that under certain circumstances they start focusing on the dot itself and not the target.", source: "PST", context: "Focal depth discussion" },
+  { targetId: "sk-dot-track", quote: "Do you see the dot dip down below the point of aim after the first shot, but before the second shot? What EXACTLY are you seeing? You need to know.", source: "PST", context: "Continual sight awareness" },
+  { targetId: "sk-dot-track", quote: "Many shooters are able to hold their guns on target during rapid fire shooting, but are unable to read the sights fast enough to take advantage of it.", source: "DFR", context: "Live-fire vs dry-fire" },
+
+  // ── sk-trans-close: Close Transition (<10yd) ──
+  { targetId: "sk-trans-close", quote: "GM benchmark: 0.2 second target transitions with one yard between each target.", source: "SDR", context: "Benchmark standards" },
+  { targetId: "sk-trans-close", quote: "Do not over aim or over confirm on close-ranged, open targets. Shoot immediately when you recognize the gun is on target. While training ask yourself, 'Could I have been shooting sooner?'", source: "PST", context: "Close target cues" },
+  { targetId: "sk-trans-close", quote: "Your gun should go to the center of the target and stop, then move quickly to the center of the next target and stop again. If you try to 'sweep' the targets, keeping the gun moving and pulling the trigger, you are likely to get bad hits.", source: "SDR", context: "Transition errors" },
+
+  // ── sk-trans-med: Medium Transition (10-20yd) ──
+  { targetId: "sk-trans-med", quote: "Consciously decide what type of sight picture you require on each target. Decide whether you are going to shoot that particular target sight focused or target focused.", source: "SDR", context: "Transition advice" },
+  { targetId: "sk-trans-med", quote: "The goal is to give each target exactly the amount of time and attention it requires, but no more.", source: "SDR", context: "Distance Transitions" },
+  { targetId: "sk-trans-med", quote: "Shoot the same target order every time during a set of runs on a transition drill for easier assessment.", source: "PST", context: "Training tips" },
+
+  // ── sk-trans-far: Far Transition (>20yd) ──
+  { targetId: "sk-trans-far", quote: "I think it is counterproductive to slow your draw stroke down for tougher targets, at least until you get the gun close to being on target. It does make sense to let the gun settle into the target as opposed to jamming it into position.", source: "DFR", context: "Distance draw" },
+  { targetId: "sk-trans-far", quote: "At 50 yards, I like to make sure my sights are perfectly stable, then I start to work the trigger again. After the shot breaks, I return the sights out of recoil, stabilize them, and then break the next shot. The level of stability you need is incredible.", source: "SDR", context: "50-yard Bill Drill" },
+
+  // ── sk-trans-near-far: Near-to-Far Transition ──
+  { targetId: "sk-trans-near-far", quote: "The focus of this drill is to be quick on all of the easy targets and be accurate on the distant targets.", source: "SDR", context: "Distance Transitions" },
+  { targetId: "sk-trans-near-far", quote: "I don't 'slam' the gun into position on difficult targets. I let the sights settle into the target much more gently. This doesn't mean you draw more slowly — you just need to finish much more gently.", source: "DFR", context: "Distance draw technique" },
+
+  // ── sk-trans-far-near: Far-to-Near Transition ──
+  { targetId: "sk-trans-far-near", quote: "Shooting close targets with a 'target focus' is usually faster than going with a 'sight focus.'", source: "SDR", context: "Aiming methods" },
+  { targetId: "sk-trans-far-near", quote: "Close ranged targets require little in the way of aiming. They allow you to 'cheat' the marksmanship rules in many respects.", source: "PST", context: "Movement drill evolution" },
+
+  // ── sk-trans-exit-entry: Transition Exit/Entry ──
+  { targetId: "sk-trans-exit-entry", quote: "Oftentimes people have a fast pair of shots on the target, but they delay moving their eyes off the target as soon as they finish it. This causes the gun to settle back down on a target they should be transitioning away from.", source: "PST", context: "Transition timing" },
+  { targetId: "sk-trans-exit-entry", quote: "You should see the sights smoothly settling in the center of each target and then immediately moving to the next target.", source: "DFR", context: "Transition guidance" },
+
+  // ── sk-trans-low: Low Target Transitions ──
+  { targetId: "sk-trans-low", quote: "Low targets are something you will encounter occasionally. You would be surprised how fast they can be shot, but engaging them at maximum speed with confidence will require some practice.", source: "SDR", context: "Low Targets" },
+  { targetId: "sk-trans-low", quote: "You should be comfortable swinging down aggressively to knock out the low targets, and swinging up aggressively to the high targets. You may find it difficult to swing up to targets both aggressively and accurately.", source: "SDR", context: "Low Targets" },
+
+  // ── sk-trans-steel: Steel/Paper Transitions ──
+  { targetId: "sk-trans-steel", quote: "You can't wait to hear audible confirmation from the steel; that is way too slow. You are going to need to accurately assess what is happening at the speed of your eyes and your sights.", source: "SDR", context: "Steel/Paper/Steel" },
+  { targetId: "sk-trans-steel", quote: "Going from steel to paper can be done in under 0.3 seconds if you are aggressive. You can do the reverse in about half a second under good circumstances.", source: "SDR", context: "Steel/Paper benchmarks" },
+  { targetId: "sk-trans-steel", quote: "As you transition from paper to steel, think in terms of finesse. Don't slam the gun around hard. Look to the center of the steel you intend to hit and let the gun settle there.", source: "SDR", context: "Steel transition technique" },
+
+  // ── sk-reload-entry: Reload in Position Entry ──
+  { targetId: "sk-reload-entry", quote: "The instant you finish the first two targets, your focus should shift to the reload. As soon as that is done, you are back up on target and shooting. Have as little 'downtime' as possible.", source: "SDR", context: "Moving Reload" },
+  { targetId: "sk-reload-entry", quote: "If you aren't able to get your reload done in the space between Position A and B, then you will absolutely defeat the purpose of this drill. If the reload isn't done, then you can't be ready to shoot.", source: "SDR", context: "Position entry with reload" },
+
+  // ── sk-move-direction: Direction Change ──
+  { targetId: "sk-move-direction", quote: "Make sure you are not making a 'false step' where you load up your weight and then take off. The 'drop step' technique is only needed when you are getting out of a leaning position.", source: "PST", context: "Movement cues" },
+  { targetId: "sk-move-direction", quote: "When training, go full power/full speed. As you go faster it will change the nature of your movement at a very fundamental level. Faster running means you need to apply the brakes and slow yourself down to a stop a bit sooner.", source: "PST", context: "Movement corrections" },
+  { targetId: "sk-move-direction", quote: "At the instant you call that last shot, you put everything you have into moving out of position.", source: "DFR", context: "Position Exit" },
+
+  // ── sk-move-prone: Prone ──
+  { targetId: "sk-move-prone", quote: "Most people experience a dramatic POI shift, causing them to hit low from prone. You need to know precisely where your bullets will impact.", source: "SDR", context: "Prone drill" },
+  { targetId: "sk-move-prone", quote: "Some shooters can virtually throw themselves onto the ground and get to shooting. Others put a hand on the ground, then lower themselves down. The better shape you are in, the more of an advantage you have.", source: "DFR", context: "Prone technique" },
+  { targetId: "sk-move-prone", quote: "You may well have to reposition your whole body just to transition! Be ready for that. You also need to train this scenario in reverse — getting up from prone.", source: "DFR", context: "Prone transitions" },
+
+  // ── sk-move-lean: Lean / Barricade ──
+  { targetId: "sk-move-lean", quote: "The whole idea is to minimize the effect of the barricade. If possible, stay back from the barricade. You want to have your upper body in as comfortable of a position as possible.", source: "SDR", context: "Lean drill" },
+  { targetId: "sk-move-lean", quote: "I find that usually when I get the outside foot exactly where it needs to be and pointed in the right direction, then the rest of my body lines up how I want it.", source: "SDR", context: "Lean technique" },
+  { targetId: "sk-move-lean", quote: "It is a natural tendency for people to want to hug up on walls and get deep into ports, but it isn't usually productive.", source: "SDR", context: "Port shooting" },
+
+  // ── sk-stage-classifier: Classifier Execution ──
+  { targetId: "sk-stage-classifier", quote: "You should practice specifically for classifiers. Your skills need to be highly refined, along with a bit of luck, to make the move from M to GM.", source: "PST", context: "GM goal setting" },
+  { targetId: "sk-stage-classifier", quote: "It was just a matter of simple math. You have X amount of time to get the pistol out and shoot the target. As soon as you figure out what time to plug into X, you push yourself in training until X becomes reality.", source: "SDR", context: "Classifier approach" },
+  { targetId: "sk-stage-classifier", quote: "You can and should know about how long it takes for you to draw and shoot a given target under some given set of circumstances.", source: "SDR", context: "Data-driven training" },
+
+  // ── sk-stage-port: Port Shooting ──
+  { targetId: "sk-stage-port", quote: "Don't wait until you can see the target to start aiming at it — you are wasting time. Start aiming before you can engage it, so as soon as the target becomes available you are ready to whack it.", source: "DFR", context: "Port commentary" },
+  { targetId: "sk-stage-port", quote: "Set up so you can engage all the targets through the port without moving your feet, if at all possible. Unnecessary foot shuffling will disrupt and destabilize your sight picture.", source: "DFR", context: "Port technique" },
+  { targetId: "sk-stage-port", quote: "Be ready to shoot when you get to the port. Have the gun up and be aiming at the first target you plan to shoot. You should get a sight picture on the target even if the wall is in the way.", source: "SDR", context: "Port Setup drill" },
+
+  // ── sk-stage-skip: Skipping Targets ──
+  { targetId: "sk-stage-skip", quote: "Eventually, you should be able to change the order of targets/positions every single run and hold a good performance. Once you can pick an order, visualize it, and execute it without hesitation you are in excellent shape.", source: "PST", context: "Stage training evolution" },
+  { targetId: "sk-stage-skip", quote: "People often end up engaging targets twice, or need to visually check a target to see if they engaged it, or they just hesitate trying to remember their plan.", source: "SDR", context: "Common failure modes" },
+  { targetId: "sk-stage-skip", quote: "Use markers on the stage to help me remember things. I might want to engage every target to the left of the barrel stack from one position, and then just shoot everything I can see from another position.", source: "SDR", context: "Memory technique" },
+
+  // ── sk-one-hand-pickup: One-Handed Pickup ──
+  { targetId: "sk-one-hand-pickup", quote: "The whole challenge is to be able to get a grip on your pistol with only one hand. I would de-emphasize sheer speed in favor of ending up with a grip as near to perfect as you possibly can.", source: "SDR", context: "One Handed Pickup" },
+  { targetId: "sk-one-hand-pickup", quote: "You need to be able to establish a grip using only one hand to pick the pistol up.", source: "SDR", context: "One Handed Pickup focus" },
+
+  // ── sk-empty-start: Empty Start / Table Pickup ──
+  { targetId: "sk-empty-start", quote: "The key to success is going to be how good of a grip I get on the pistol when I pick it up, and how good of a grip I get on the magazine.", source: "SDR", context: "Empty start" },
+  { targetId: "sk-empty-start", quote: "I am a lot more successful when I keep my hands and arms relaxed and ready to move. If I tense up (like under pressure in a match), my success rate goes down. I like to 'shake out' my arms and hands just before I get the start signal.", source: "SDR", context: "Empty start tension" },
+  { targetId: "sk-empty-start", quote: "At most major matches, they have at least one stage where you need to pick your gun up and load it. You should never have any anxiety about any of these scenarios.", source: "SDR", context: "Why to practice" },
+
+  // ── sk-table-start: Table Start / Mag Stuff ──
+  { targetId: "sk-table-start", quote: "When running this scenario, pay careful attention to how you stow the magazines away. I recommend looking down at the pouch and actually looking the magazines into place.", source: "SDR", context: "Table Start technique" },
+  { targetId: "sk-table-start", quote: "Do you load the gun, then stuff the ammo, or the other way around? Pretty much every time I go to a match with a stage like this, I see people confused by how to go about it.", source: "SDR", context: "Table Start sequencing" },
+
+  // ── sk-mover: Moving Target Engagement ──
+  { targetId: "sk-mover", quote: "Track the target. The most important thing to remember when shooting a mover is your vision should be on the spot on the target that you wish to hit. Your gun will naturally track that spot if you keep your vision focused there.", source: "PST", context: "Moving Targets cues" },
+  { targetId: "sk-mover", quote: "It is extremely common on swinging targets for the target to be hit low. The low part of the swinger will attract your vision because it moves slower. Remember, you hit where you look.", source: "PST", context: "Moving Targets corrections" },
+  { targetId: "sk-mover", quote: "So many shooters watch a prop activation during the walkthrough and decide that they aren't fast enough. It really isn't as tough as it looks; you just need to try it.", source: "SDR", context: "Mover drill" },
+
+  // ══════════════════════════════════════════
+  // THIN COVERAGE: Additional sources for 1-source skills
+  // ══════════════════════════════════════════
+
+  // ── sk-confirm-1: Kinesthetic (add DFR) ──
+  { targetId: "sk-confirm-1", quote: "Your draw is where your grip and sight alignment converge to create an 'index.' You need that index, so you can look to a spot and have the sights show up in alignment on that spot quickly and consistently.", source: "DFR", context: "Draw index" },
+  { targetId: "sk-confirm-1", quote: "I also like to see just how little 'sight picture' I can get away with and still shoot A's. Seeing the outline of the gun on the target is usually enough.", source: "SDR", context: "Close range" },
+
+  // ── sk-confirm-2: Color Reaction (add SDR) ──
+  { targetId: "sk-confirm-2", quote: "Shooting close targets with a 'target focus' is usually faster than going with a 'sight focus.'", source: "SDR", context: "Aiming methods" },
+  { targetId: "sk-confirm-2", quote: "Can you get A zone hits by shooting target focused? Do you just use your fiber dot? These are individual questions that you need to answer for yourself through experimentation.", source: "DFR", context: "Standard Exercises" },
+
+  // ── sk-confirm-3: Full Sight Picture (add SDR) ──
+  { targetId: "sk-confirm-3", quote: "At 50 yards, I like to make sure my sights are perfectly stable, then I start to work the trigger. The level of stability you need to have in order to do this well is incredible.", source: "SDR", context: "50-yard Bill Drill" },
+  { targetId: "sk-confirm-3", quote: "Is it OK to just have target focus or do you need a sharp sight focus? How much sight misalignment is acceptable? You get the answers during live-fire training.", source: "DFR", context: "Transition training" },
+
+  // ── sk-trans-wide: Wide Transition (add PST + DFR) ──
+  { targetId: "sk-trans-wide", quote: "Hits patterning in the direction of the transition are often caused by 'overdriving' the gun. Make sure you start applying the brakes during the wide transition before you get the gun to the target. Relaxing your shoulders can help.", source: "PST", context: "Wide transition cues" },
+  { targetId: "sk-trans-wide", quote: "On this drill, you may feel a sensation of having the transition come from your legs. I think that is a good thing and it may help you be a bit faster from target to target.", source: "DFR", context: "Wide Transitions" },
+
+  // ── sk-reload-move: Reload on the Move (add DFR) ──
+  { targetId: "sk-reload-move", quote: "Make sure you start holding the gun with a firm and realistic firing grip, reload, then finish back on a realistic firing grip.", source: "DFR", context: "Reload elements" },
+
+  // ── sk-move-mounted: Mounted Movement (add SDR) ──
+  { targetId: "sk-move-mounted", quote: "Most importantly, the gun should stay up high for the entirety of the drill. Keep the gun at your eyeline looking to the next target as you move.", source: "SDR", context: "Short Moves" },
+  { targetId: "sk-move-mounted", quote: "A couple steps before you are stopped, you should already be aiming at the first target you intend to shoot in the position you are getting into.", source: "DFR", context: "Position entry" },
+
+  // ── sk-move-unmounted: Unmounted Movement (add SDR) ──
+  { targetId: "sk-move-unmounted", quote: "The goal is to be able to move at just about a flat run and still hit A's on the targets.", source: "SDR", context: "Shooting on the Move" },
+  { targetId: "sk-move-unmounted", quote: "I like to strive for a feeling of pushing with both my feet to get out of position. I want to use all the muscles at my disposal to exit that initial shooting position.", source: "DFR", context: "Position Exit" },
+
+  // ── sk-move-soft: Soft Stops (add DFR) ──
+  { targetId: "sk-move-soft", quote: "As you work through this drill, be sure you carefully watch your sights! They are going to tell you the whole story about your stability level as you move around. If you see your sights bouncing as you come into a new shooting position, you need to fix that with your legs and knees.", source: "DFR", context: "Movement scenario" },
+
+  // ── sk-move-short: Short Moves (add DFR + PST) ──
+  { targetId: "sk-move-short", quote: "This drill is designed to develop your ability to make a short movement in an explosive, but controlled fashion. The dynamics are a bit different than scenarios where you have more space to run.", source: "DFR", context: "Short Movement drill" },
+  { targetId: "sk-move-short", quote: "Keep both of your feet planted firmly on the ground until it is time to move. When you move, push with both feet aggressively to the other side of your shooting area.", source: "SDR", context: "Short Moves technique" },
+
+  // ── Fill remaining single-source gaps ──
+  { targetId: "sk-draw-first", quote: "At the tone, engage the very center of the A zone. Fire one round only. Note the time.", source: "PST", context: "Confirmation Drill — first shot benchmark" },
+  { targetId: "sk-grip-support", quote: "Your non-dominant hand should be giving 100% of available grip strength and should be positioned properly on the gun. This needs to be done as soon as the gun hits your eyeline.", source: "DFR", context: "Draw elements, support hand" },
+  { targetId: "sk-trans-low", quote: "I think the biggest challenge with low transitions is that your arms can actually be in the way of your vision of the low target. This doesn't necessarily screw things up, it can just be a little bit disconcerting.", source: "DFR", context: "Low Target transitions" },
+  { targetId: "sk-trans-steel", quote: "I like to build the habit of carefully calling every shot during my own practice, firing makeup shots as appropriate.", source: "DFR", context: "Plate Rack — steel shot calling" },
+  { targetId: "sk-reload-entry", quote: "Most field courses have the next target available after just a few steps, so you need to get the gun loaded and ready to go right away.", source: "PST", context: "Moving Reload context" },
+  { targetId: "sk-move-lean", quote: "Depending on how far you need to lean, this can really turn into a patience drill. The more you disrupt your regular shooting position, the more you need to make sure that the sights are returning to the target.", source: "PST", context: "Lean drill evolution" },
+  { targetId: "sk-one-hand-pickup", quote: "Your goal is a perfect grip as you bring the gun up. De-emphasize speed in favor of grip quality.", source: "DFR", context: "Gun Pickup goal" },
+  { targetId: "sk-empty-start", quote: "It is not at all uncommon that you will be required to start with your gun unloaded and the ammunition placed on a table or a barrel. This drill should prepare you for that scenario.", source: "DFR", context: "Ammo Pickup" },
+  { targetId: "sk-table-start", quote: "The focus is getting used to grabbing your magazines and stuffing them in your pouches as you move to a shooting position. Look the magazines into place.", source: "DFR", context: "Table Start preparation" },
 ];
