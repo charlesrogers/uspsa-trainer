@@ -6,6 +6,8 @@ import { skills, drills, drillSkillMaps } from "@/lib/store";
 import { coachingQuotes } from "@/data/seed";
 import { computeAllSkillEstimates } from "@/lib/skillEstimation";
 import type { SkillEstimate } from "@/lib/skillEstimation";
+import { computeMasteryTimeline, computeTrendDelta } from "@/lib/trends";
+import TrendChart from "../components/TrendChart";
 import type { Skill } from "@/data/seed";
 
 // ─── Layout constants ───
@@ -683,6 +685,43 @@ export default function KnowledgeGraphPage() {
                 </div>
               </div>
             )}
+
+            {/* Mastery Trend */}
+            {selectedNode.estimate && selectedNode.estimate.confidence > 0 && (() => {
+              const timeline = computeMasteryTimeline(selectedNode.id, 8);
+              const sparkData = timeline.map((s) => ({ date: s.date, value: s.mastery }));
+              const { delta, weeksWithData } = computeTrendDelta(timeline);
+              const hasTimeline = sparkData.some((d) => d.value > 0) && sparkData.length >= 2;
+
+              if (!hasTimeline) return null;
+
+              return (
+                <div
+                  className="rounded-lg p-3"
+                  style={{ background: "var(--bg-elevated)" }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium" style={{ color: "#8b8ba0" }}>
+                      Trend
+                    </span>
+                    {weeksWithData >= 2 && (
+                      <span
+                        className="text-[11px] font-mono font-medium"
+                        style={{ color: delta >= 0 ? "#22c55e" : "#ef4444" }}
+                      >
+                        {delta >= 0 ? "+" : ""}{Math.round(delta)}% over {weeksWithData - 1}w
+                      </span>
+                    )}
+                  </div>
+                  <TrendChart
+                    data={sparkData}
+                    width={240}
+                    height={80}
+                    showXLabels
+                  />
+                </div>
+              );
+            })()}
 
             {/* Prerequisites (DAG edges) */}
             {selectedPrereqs.length > 0 && (

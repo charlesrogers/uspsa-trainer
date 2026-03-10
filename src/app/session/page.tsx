@@ -1,11 +1,14 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createSession } from "@/lib/store";
 import { generateId } from "@/lib/utils";
 import { useBle } from "@/lib/useBle";
+import { getConstraints, saveConstraints, type SessionConstraints } from "@/lib/recommendations";
+import { generateSessionPlan, savePlan } from "@/lib/sessionPlanner";
+import ConstraintSelector from "@/app/components/ConstraintSelector";
 
 export default function NewSessionPageWrapper() {
   return (
@@ -23,6 +26,31 @@ function NewSessionPage() {
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const ble = useBle();
+  const [constraints, setConstraints] = useState<SessionConstraints | null>(null);
+
+  useEffect(() => {
+    setConstraints(getConstraints());
+  }, []);
+
+  const handleConstraintsChange = (c: SessionConstraints) => {
+    setConstraints(c);
+    saveConstraints(c);
+    // Sync fire mode with constraints
+    setFireMode(c.fireMode);
+  };
+
+  const handleGenerateWorkout = () => {
+    if (!constraints) return;
+    // Generate the plan with current constraints
+    const plan = generateSessionPlan({
+      totalMinutes: constraints.timeMinutes,
+      fireMode: constraints.fireMode,
+      maxDistance: constraints.maxDistance,
+      hasMovementSpace: constraints.movementAvailable,
+    });
+    savePlan(plan);
+    router.push("/session/plan");
+  };
 
   const handleStart = () => {
     const session = {
@@ -181,11 +209,45 @@ function NewSessionPage() {
           </div>
         </div>
 
+        {/* Generate Workout */}
+        {constraints && (
+          <div className="mt-6 bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-brand-600/15 flex items-center justify-center">
+                <svg className="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold">Generate Workout</h3>
+                <p className="text-xs text-surface-500">Get a structured plan based on your skill gaps</p>
+              </div>
+            </div>
+            <ConstraintSelector
+              constraints={constraints}
+              onChange={handleConstraintsChange}
+            />
+            <button
+              onClick={handleGenerateWorkout}
+              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl mt-4 text-sm"
+            >
+              Generate Today&apos;s Workout
+            </button>
+          </div>
+        )}
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 mt-6 mb-2">
+          <div className="flex-1 border-t border-surface-200" />
+          <span className="text-xs text-surface-400 font-medium">or</span>
+          <div className="flex-1 border-t border-surface-200" />
+        </div>
+
         <button
           onClick={handleStart}
-          className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 rounded-xl mt-6 text-lg transition-colors"
+          className="w-full bg-surface-100 hover:bg-surface-200 text-surface-600 font-semibold py-4 rounded-xl mt-2 text-lg transition-colors"
         >
-          Start Session
+          Free Practice
         </button>
       </div>
     </div>

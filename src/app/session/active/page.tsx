@@ -18,6 +18,15 @@ import type { Session, SessionRun } from "@/lib/store";
 import { generateId, formatTime, pctColor } from "@/lib/utils";
 import { useBle, useShotData } from "@/lib/useBle";
 import type { ShotData } from "@/lib/ble";
+import {
+  loadPlan,
+  loadPlanProgress,
+  savePlanProgress,
+  clearPlan,
+  clearPlanProgress,
+  type SessionPlan,
+  type PlanProgress,
+} from "@/lib/sessionPlanner";
 
 export default function ActiveSessionPageWrapper() {
   return (
@@ -31,12 +40,17 @@ function ActiveSessionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedDrillId = searchParams.get("drillId");
+  const hasPlan = searchParams.get("plan") === "true";
 
   const [session, setSession] = useState<Session | null>(null);
   const [runs, setRuns] = useState<SessionRun[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [classification, setClassification] = useState("B");
+
+  // Plan state
+  const [plan, setPlan] = useState<SessionPlan | null>(null);
+  const [planProgress, setPlanProgress] = useState<PlanProgress | null>(null);
 
   // Run entry form state
   const [selectedDrillId, setSelectedDrillId] = useState(preselectedDrillId || "dr-bill");
@@ -54,8 +68,6 @@ function ActiveSessionPage() {
   const ble = useBle();
 
   const handleShotData = useCallback((data: ShotData) => {
-    // Only populate if it looks like a full string (not per-shot push updates during a string)
-    // Per-shot pushes have shotCount=1; full strings from REQ STRING HEX have shotCount >= 1
     setTotalTime(data.totalTime.toString());
     if (data.firstShotTime) setFirstShotTime(data.firstShotTime.toString());
     if (data.splits.length > 0) setSplitsInput(data.splits.map(s => s.toFixed(2)).join(", "));
@@ -75,7 +87,45 @@ function ActiveSessionPage() {
     setSession(active);
     setRuns(getSessionRuns(active.id));
     setClassification(getProfile().classification);
-  }, [router]);
+
+    // Load plan if we came from the plan page
+    if (hasPlan) {
+      const savedPlan = loadPlan();
+      const savedProgress = loadPlanProgress();
+      if (savedPlan) {
+        setPlan(savedPlan);
+        if (savedProgress && savedProgress.sessionId === active.id) {
+          setPlanProgress(savedProgress);
+        } else {
+          // Initialize progress
+          const progress: PlanProgress = {
+            planId: savedPlan.id,
+            sessionId: active.id,
+            completedDrillIndices: [],
+            skippedDrillIndices: [],
+          };
+          setPlanProgress(progress);
+          savePlanProgress(progress);
+        }
+        // Pre-select the first planned drill
+        if (savedPlan.drills.length > 0) {
+          const firstDrill = savedPlan.drills[0];
+          setSelectedDrillId(firstDrill.drillId);
+          setSelectedDistance(firstDrill.distanceYards);
+        }
+      }
+    } else {
+      // Check if there's an existing plan progress for this session
+      const savedProgress = loadPlanProgress();
+      if (savedProgress && savedProgress.sessionId === active.id) {
+        const savedPlan = loadPlan();
+        if (savedPlan) {
+          setPlan(savedPlan);
+          setPlanProgress(savedProgress);
+        }
+      }
+    }
+  }, [router, hasPlan]);
 
   // Elapsed time timer
   useEffect(() => {
@@ -93,13 +143,13 @@ function ActiveSessionPage() {
     if (selectedDrill && !selectedDrill.distances.includes(selectedDistance)) {
       setSelectedDistance(selectedDrill.distances[0] || 7);
     }
-  }, [selectedDrillId]);
+  }, [selectedDrillId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshRuns = useCallback(() => {
     if (session) setRuns(getSessionRuns(session.id));
   }, [session]);
 
-  // Detect cold run: first run in session for the drill's primary skill
+  // Detect cold run
   const detectCold = useCallback(() => {
     if (!session) return false;
     const currentRuns = getSessionRuns(session.id).filter((r) => r.isValid);
@@ -107,7 +157,6 @@ function ActiveSessionPage() {
     const primarySkill = drillSkills.find((s) => s.isPrimary);
     if (!primarySkill) return currentRuns.length === 0;
 
-    // Check if any existing run's drill shares the same primary skill
     for (const run of currentRuns) {
       const runSkills = getDrillSkills(run.drillId);
       if (runSkills.some((s) => s.isPrimary && s.skillId === primarySkill.skillId)) {
@@ -116,6 +165,75 @@ function ActiveSessionPage() {
     }
     return true;
   }, [session, selectedDrillId]);
+
+  // Get next planned drill index
+  const getNextPlannedDrillIndex = useCallback((): number | null => {
+    if (!plan || !planProgress) return null;
+    for (let i = 0; i < plan.drills.length; i++) {
+      if (!planProgress.completedDrillIndices.includes(i) &&
+          !planProgress.skippedDrillIndices.includes(i)) {
+        return i;
+      }
+    }
+    return null;
+  }, [plan, planProgress]);
+
+  // Mark current planned drill as complete and auto-advance
+  const advancePlan = useCallback(() => {
+    if (!plan || !planProgress) return;
+
+    // Find which planned drill matches current selection
+    const matchIdx = plan.drills.findIndex(
+      (d) => d.drillId === selectedDrillId
+    );
+    if (matchIdx >= 0 && !planProgress.completedDrillIndices.includes(matchIdx)) {
+      const newProgress = {
+        ...planProgress,
+        completedDrillIndices: [...planProgress.completedDrillIndices, matchIdx],
+      };
+      setPlanProgress(newProgress);
+      savePlanProgress(newProgress);
+
+      // Auto-advance to next planned drill
+      const nextIdx = plan.drills.findIndex(
+        (_, i) => !newProgress.completedDrillIndices.includes(i) && !newProgress.skippedDrillIndices.includes(i)
+      );
+      if (nextIdx >= 0) {
+        const nextDrill = plan.drills[nextIdx];
+        setSelectedDrillId(nextDrill.drillId);
+        setSelectedDistance(nextDrill.distanceYards);
+      }
+    }
+  }, [plan, planProgress, selectedDrillId]);
+
+  const handleSkipDrill = (index: number) => {
+    if (!planProgress) return;
+    const newProgress = {
+      ...planProgress,
+      skippedDrillIndices: [...planProgress.skippedDrillIndices, index],
+    };
+    setPlanProgress(newProgress);
+    savePlanProgress(newProgress);
+
+    // Auto-advance
+    if (plan) {
+      const nextIdx = plan.drills.findIndex(
+        (_, i) => !newProgress.completedDrillIndices.includes(i) && !newProgress.skippedDrillIndices.includes(i)
+      );
+      if (nextIdx >= 0) {
+        const nextDrill = plan.drills[nextIdx];
+        setSelectedDrillId(nextDrill.drillId);
+        setSelectedDistance(nextDrill.distanceYards);
+      }
+    }
+  };
+
+  const selectPlannedDrill = (index: number) => {
+    if (!plan) return;
+    const drill = plan.drills[index];
+    setSelectedDrillId(drill.drillId);
+    setSelectedDistance(drill.distanceYards);
+  };
 
   const handleSave = () => {
     if (!session || !totalTime) return;
@@ -155,6 +273,22 @@ function ActiveSessionPage() {
     };
 
     addRun(run);
+
+    // Check if we've done enough reps for this planned drill
+    if (plan && planProgress) {
+      const planIdx = plan.drills.findIndex(d => d.drillId === selectedDrillId);
+      if (planIdx >= 0) {
+        const plannedDrill = plan.drills[planIdx];
+        const runsForThisDrill = [...runs, run].filter(
+          r => r.drillId === selectedDrillId && r.isValid
+        ).length;
+        if (runsForThisDrill >= plannedDrill.reps) {
+          // Auto-mark as complete after saving
+          setTimeout(() => advancePlan(), 0);
+        }
+      }
+    }
+
     refreshRuns();
     // Reset form
     setTotalTime("");
@@ -164,7 +298,6 @@ function ActiveSessionPage() {
     setCustomPtsDown("");
     setCallGood("");
     setCallTotal("");
-    // Refresh runs
     setRuns(getSessionRuns(session.id));
   };
 
@@ -205,6 +338,8 @@ function ActiveSessionPage() {
   const handleEndSession = () => {
     if (!session) return;
     endSession(session.id);
+    clearPlan();
+    clearPlanProgress();
     router.push(`/history/${session.id}`);
   };
 
@@ -216,6 +351,10 @@ function ActiveSessionPage() {
     selectedDistance,
     session.fireMode
   );
+
+  const completedCount = planProgress?.completedDrillIndices.length || 0;
+  const totalPlanned = plan?.drills.length || 0;
+  const nextDrillIdx = getNextPlannedDrillIndex();
 
   return (
     <div>
@@ -250,6 +389,107 @@ function ActiveSessionPage() {
       </div>
 
       <div className="px-4 pt-4">
+        {/* Plan progress tracker */}
+        {plan && planProgress && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-surface-500 uppercase tracking-wider">
+                Workout Plan
+              </h3>
+              <span className="text-xs text-surface-400">
+                {completedCount} of {totalPlanned} drills
+              </span>
+            </div>
+            {/* Progress bar */}
+            <div className="w-full h-1.5 bg-surface-200 rounded-full mb-3">
+              <div
+                className="h-full bg-brand-600 rounded-full transition-all duration-300"
+                style={{ width: totalPlanned > 0 ? `${(completedCount / totalPlanned) * 100}%` : "0%" }}
+              />
+            </div>
+            {/* Drill list */}
+            <div className="space-y-1.5">
+              {plan.drills.map((pd, i) => {
+                const isCompleted = planProgress.completedDrillIndices.includes(i);
+                const isSkipped = planProgress.skippedDrillIndices.includes(i);
+                const isCurrent = i === nextDrillIdx;
+                const isActive = pd.drillId === selectedDrillId;
+                const isWeakness = pd.purpose === "weakness";
+
+                return (
+                  <div
+                    key={pd.drillId + i}
+                    className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm cursor-pointer ${
+                      isCurrent
+                        ? "bg-brand-600/10 border border-brand-600/30"
+                        : isActive
+                        ? "bg-surface-100 border border-surface-300"
+                        : isCompleted
+                        ? "opacity-50"
+                        : isSkipped
+                        ? "opacity-30"
+                        : "hover:bg-surface-100"
+                    }`}
+                    onClick={() => !isCompleted && !isSkipped && selectPlannedDrill(i)}
+                  >
+                    {/* Status indicator */}
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                      isCompleted
+                        ? "bg-brand-600"
+                        : isSkipped
+                        ? "bg-surface-300"
+                        : isCurrent
+                        ? "border-2 border-brand-600"
+                        : "border border-surface-300"
+                    }`}>
+                      {isCompleted && (
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {isSkipped && (
+                        <svg className="w-3 h-3 text-surface-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path d="M9 5l7 7-7 7" />
+                        </svg>
+                      )}
+                      {!isCompleted && !isSkipped && (
+                        <span className="text-[10px] font-bold text-surface-500">{i + 1}</span>
+                      )}
+                    </div>
+                    {/* Drill info */}
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs font-medium leading-tight truncate ${
+                        isCompleted || isSkipped ? "line-through text-surface-400" : ""
+                      }`}>
+                        {pd.drillName}
+                      </div>
+                      <div className="text-[10px] text-surface-500">
+                        {pd.distanceYards}yd &middot; {pd.reps} reps
+                      </div>
+                    </div>
+                    {/* Purpose badge */}
+                    <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full shrink-0 ${
+                      isWeakness ? "bg-amber-500/15 text-amber-400" : "bg-brand-600/15 text-brand-400"
+                    }`}>
+                      {isWeakness ? "WEAK" : "MAINT"}
+                    </span>
+                    {/* Skip button */}
+                    {!isCompleted && !isSkipped && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleSkipDrill(i); }}
+                        className="text-[10px] text-surface-400 hover:text-surface-600 shrink-0"
+                        title="Skip drill"
+                      >
+                        Skip
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Completed runs */}
         {runs.length > 0 && (
           <div className="mb-4">

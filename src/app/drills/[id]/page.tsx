@@ -17,6 +17,7 @@ import {
 import type { SessionRun } from "@/lib/store";
 import { coachingQuotes } from "@/data/seed";
 import { categoryColor, categoryLabel, formatDate, formatTime, pctColor } from "@/lib/utils";
+import DryFireDistanceCalc from "@/app/components/DryFireDistanceCalc";
 
 export default function DrillDetailPage() {
   const params = useParams();
@@ -328,6 +329,16 @@ export default function DrillDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Dry Fire Setup — for drills that support dry fire */}
+        {(drill.mode === "dry_fire" || drill.mode === "both") && (
+          <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-3">
+            <DryFireDistanceCalc
+              presetDistances={drill.distances}
+              compact
+            />
+          </div>
+        )}
 
         {/* Run This Drill */}
         {hasActiveSession ? (

@@ -7,6 +7,9 @@ import type { Session } from "@/lib/store";
 import { formatDate, minutesBetween, pctBgColor } from "@/lib/utils";
 import { computeCategoryEstimates, getWeakestSkills, hasAnyData } from "@/lib/skillEstimation";
 import type { CategoryEstimate, SkillEstimate } from "@/lib/skillEstimation";
+import { computeOverallTimeline, computeCategoryTimeline, computeTrendDelta } from "@/lib/trends";
+import type { MasterySnapshot } from "@/lib/trends";
+import TrendChart from "./components/TrendChart";
 import { getAssessmentPlan, isAnyAssessmentComplete } from "@/lib/assessment";
 import type { AssessmentPlan } from "@/lib/assessment";
 import { getConstraints, saveConstraints, getTopRecommendations, buildSessionPlan } from "@/lib/recommendations";
@@ -82,6 +85,9 @@ export default function DashboardPage() {
   const [topRecs, setTopRecs] = useState<DrillRecommendation[]>([]);
   const [plan, setPlan] = useState<SessionPlan | null>(null);
   const [showPlanBuilder, setShowPlanBuilder] = useState(false);
+  const [overallTimeline, setOverallTimeline] = useState<MasterySnapshot[]>([]);
+  const [catTimelines, setCatTimelines] = useState<Map<string, MasterySnapshot[]>>(new Map());
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -102,6 +108,14 @@ export default function DashboardPage() {
     setConstraints(c);
     if (data) {
       setTopRecs(getTopRecommendations(c, 3));
+      // Compute trend timelines
+      setOverallTimeline(computeOverallTimeline(8));
+      const catMap = new Map<string, MasterySnapshot[]>();
+      const cats = computeCategoryEstimates();
+      for (const cat of cats) {
+        catMap.set(cat.category, computeCategoryTimeline(cat.category, 8));
+      }
+      setCatTimelines(catMap);
     }
   }, []);
 
@@ -387,25 +401,71 @@ export default function DashboardPage() {
               View Graph →
             </Link>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-1">
             {categories.map((cat) => {
               const label = CATEGORY_LABELS[cat.category] || cat.category;
               const pct = Math.round(cat.mastery);
               const hasConfidence = cat.confidence > 0;
+              const timeline = catTimelines.get(cat.category) || [];
+              const sparkData = timeline.map((s) => ({ date: s.date, value: s.mastery }));
+              const isExpanded = expandedCat === cat.category;
               return (
-                <div key={cat.category} className="flex items-center gap-3">
-                  <span className="text-xs w-24 truncate" style={{ color: "#8b8ba0" }}>{label}</span>
-                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "#252530" }}>
-                    {hasConfidence && (
-                      <div
-                        className={`h-full rounded-full bg-gradient-to-r ${skillBarGradient(pct)} transition-all duration-500`}
-                        style={{ width: `${Math.max(pct, 3)}%` }}
-                      />
+                <div key={cat.category}>
+                  <button
+                    className="flex items-center gap-3 w-full py-1.5 rounded-lg transition-colors text-left"
+                    style={{ backgroundColor: isExpanded ? "rgba(255,255,255,0.02)" : "transparent" }}
+                    onClick={() => setExpandedCat(isExpanded ? null : cat.category)}
+                  >
+                    <span className="text-xs w-24 truncate" style={{ color: "#8b8ba0" }}>{label}</span>
+                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "#252530" }}>
+                      {hasConfidence && (
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${skillBarGradient(pct)} transition-all duration-500`}
+                          style={{ width: `${Math.max(pct, 3)}%` }}
+                        />
+                      )}
+                    </div>
+                    {hasConfidence && sparkData.length >= 2 && (
+                      <div className="flex-shrink-0" style={{ width: 48, height: 20 }}>
+                        <TrendChart data={sparkData} width={48} height={20} sparkline />
+                      </div>
                     )}
-                  </div>
-                  <span className="text-xs font-mono w-10 text-right" style={{ color: hasConfidence ? "#8b8ba0" : "#6b6b80" }}>
-                    {hasConfidence ? `${pct}%` : "\u2014"}
-                  </span>
+                    <span className="text-xs font-mono w-10 text-right flex-shrink-0" style={{ color: hasConfidence ? "#8b8ba0" : "#6b6b80" }}>
+                      {hasConfidence ? `${pct}%` : "\u2014"}
+                    </span>
+                  </button>
+                  {/* Expanded trend chart */}
+                  {isExpanded && hasConfidence && sparkData.length >= 2 && (
+                    <div
+                      className="mt-2 mb-2 rounded-lg p-3"
+                      style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-medium" style={{ color: "#8b8ba0" }}>
+                          {label} Trend
+                        </span>
+                        {(() => {
+                          const { delta, weeksWithData } = computeTrendDelta(timeline);
+                          if (weeksWithData < 2) return null;
+                          return (
+                            <span
+                              className="text-[11px] font-mono font-medium"
+                              style={{ color: delta >= 0 ? "#22c55e" : "#ef4444" }}
+                            >
+                              {delta >= 0 ? "+" : ""}{Math.round(delta)}% over {weeksWithData - 1}w
+                            </span>
+                          );
+                        })()}
+                      </div>
+                      <TrendChart
+                        data={sparkData}
+                        width={280}
+                        height={100}
+                        showLabels
+                        showXLabels
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -456,6 +516,54 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* ── Progress Trend ── */}
+      {hasData && overallTimeline.some((s) => s.confidence > 0) && (
+        <div className="px-6 mb-8">
+          <div
+            className="rounded-xl p-5"
+            style={{
+              backgroundColor: "#1a1a25",
+              border: "1px solid rgba(255,255,255,0.04)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold" style={{ color: "#f0f0f5" }}>Progress</h3>
+              {(() => {
+                const { delta, weeksWithData } = computeTrendDelta(overallTimeline);
+                if (weeksWithData < 2) return null;
+                return (
+                  <span
+                    className="text-xs font-mono font-medium flex items-center gap-1"
+                    style={{ color: delta >= 0 ? "#22c55e" : "#ef4444" }}
+                  >
+                    {delta >= 0 ? (
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path d="M5 15l7-7 7 7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                    {delta >= 0 ? "+" : ""}{Math.round(delta)}% over {weeksWithData - 1}w
+                  </span>
+                );
+              })()}
+            </div>
+            <TrendChart
+              data={overallTimeline.map((s) => ({ date: s.date, value: s.mastery }))}
+              width={320}
+              height={140}
+              showLabels
+              showXLabels
+            />
+            <p className="text-[11px] mt-3" style={{ color: "#6b6b80" }}>
+              Overall mastery trend — last 8 weeks
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── Recent Sessions ── */}
       <div className="px-6 mb-8">
