@@ -2,7 +2,7 @@
 // Given skill estimates + constraints, builds prioritized training plans
 
 import { drills, skills, drillSkillMaps, allBenchmarks } from "./store";
-import { computeAllSkillEstimates, type SkillEstimate } from "./skillEstimation";
+import { computeAllSkillEstimates, getDiagnosticNeeds, type SkillEstimate } from "./skillEstimation";
 import { getProfile } from "./store";
 
 export interface SessionConstraints {
@@ -176,6 +176,21 @@ export function generateRecommendations(constraints: SessionConstraints): DrillR
       estimatedMinutes: estimateDrillMinutes(drill.id),
       roundCount: drill.roundCount,
     });
+  }
+
+  // Boost priority for drills that target declining/stagnating skills
+  const diagnosticNeeds = getDiagnosticNeeds();
+  const diagnosticSkillIds = new Set(diagnosticNeeds.map(d => d.skillId));
+  for (const rec of scored) {
+    const hasDiagnosticSkill = rec.targetSkillIds.some(id => diagnosticSkillIds.has(id));
+    if (hasDiagnosticSkill) {
+      rec.priority *= 1.5; // 50% boost for diagnostic-relevant drills
+      const diagSkill = diagnosticNeeds.find(d => rec.targetSkillIds.includes(d.skillId));
+      if (diagSkill) {
+        const label = diagSkill.trend === "declining" ? "Diagnose" : "Unstick";
+        rec.reason = `${label}: ${diagSkill.name} (${Math.round(diagSkill.mastery)}%)`;
+      }
+    }
   }
 
   // Sort by priority descending, deduplicate by not recommending drills too similar

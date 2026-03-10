@@ -63,7 +63,16 @@ function collectSignals(targetClass: string): Map<string, SkillSignal[]> {
     const bm = findBenchmark(run.drillId, targetClass, run.distanceYards, run.fireMode);
     if (!bm) continue;
 
-    const pctOfBenchmark = (bm.targetTime / run.totalTime) * 100;
+    // USPSA Hit Factor weighting: Points / Time
+    const drill = drills.find(d => d.id === run.drillId);
+    const maxPoints = (drill?.roundCount || 6) * 5;
+    let accuracyMult = 1.0;
+    if (run.fireMode === "live_fire" && run.pointsDown !== null && run.pointsDown !== undefined) {
+      accuracyMult = Math.max(0.1, (maxPoints - run.pointsDown) / maxPoints);
+    } else if (run.fireMode === "dry_fire" && run.dryFireCallPct !== null && run.dryFireCallPct !== undefined) {
+      accuracyMult = run.dryFireCallPct / 100;
+    }
+    const pctOfBenchmark = (bm.targetTime / run.totalTime) * accuracyMult * 100;
     const daysSince = (now - new Date(run.capturedAt).getTime()) / 86400000;
     const recencyWeight = Math.pow(0.97, daysSince); // gentle decay
     const coldBonus = run.isCold ? 1.2 : 1.0;
@@ -210,4 +219,18 @@ export function getWeakestSkills(count: number = 5): SkillEstimate[] {
 
 export function hasAnyData(): boolean {
   return getRuns().filter(r => r.isValid).length > 0;
+}
+
+/** Skills that are declining or stagnating below target — candidates for diagnostic drills */
+export function getDiagnosticNeeds(threshold: number = 70): SkillEstimate[] {
+  const estimates = computeAllSkillEstimates();
+  return estimates.filter(e => {
+    const skill = skills.find(s => s.id === e.skillId);
+    if (!skill || skill.parentId) return false; // top-level only
+    // Declining skills always need diagnosis
+    if (e.trend === "declining" && e.confidence >= 0.4) return true;
+    // Stagnating below threshold needs diagnosis
+    if (e.trend === "stable" && e.mastery < threshold && e.confidence >= 0.6) return true;
+    return false;
+  });
 }

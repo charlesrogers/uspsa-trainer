@@ -379,7 +379,13 @@ export default function DashboardPage() {
         >
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-sm font-semibold" style={{ color: "#f0f0f5" }}>Skill Overview</h3>
-            <span className="text-[11px] font-medium" style={{ color: "#6b6b80" }}>vs. target classification</span>
+            <Link
+              href="/graph"
+              className="text-[11px] font-medium hover:brightness-150 transition-all"
+              style={{ color: "#6b6b80" }}
+            >
+              View Graph →
+            </Link>
           </div>
           <div className="space-y-3">
             {categories.map((cat) => {

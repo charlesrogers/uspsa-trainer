@@ -17,6 +17,7 @@ export interface Skill {
   category: "fundamentals" | "transitions" | "reloads" | "movement" | "stage_craft" | "single_hand" | "confirmation" | "other";
   description: string;
   parentId: string | null;
+  prerequisites?: string[];  // Cross-category skill IDs this skill depends on (DAG edges)
   levelIntroduced: number;
 }
 
@@ -110,7 +111,7 @@ export const skills: Skill[] = [
 
   // Confirmation schemes
   { id: "sk-confirm", name: "Confirmation Scheme Selection", category: "confirmation", description: "Choosing the right aiming strategy for target distance/difficulty", parentId: null, levelIntroduced: 2 },
-  { id: "sk-confirm-1", name: "Kinesthetic Alignment", category: "confirmation", description: "Fire on feel of alignment, no visual confirmation", parentId: "sk-confirm", levelIntroduced: 3 },
+  { id: "sk-confirm-1", name: "Kinesthetic Alignment", category: "confirmation", description: "Fire on feel of alignment, no visual confirmation", parentId: "sk-confirm", prerequisites: ["sk-draw", "sk-cadence"], levelIntroduced: 3 },
   { id: "sk-confirm-2", name: "Color Reaction", category: "confirmation", description: "React to color of sight/dot crossing aiming area", parentId: "sk-confirm", levelIntroduced: 2 },
   { id: "sk-confirm-3", name: "Full Sight Picture", category: "confirmation", description: "Dot stopped and stable, perfect sight picture", parentId: "sk-confirm", levelIntroduced: 1 },
 
@@ -121,39 +122,39 @@ export const skills: Skill[] = [
   { id: "sk-trans-far", name: "Far Transition (>20yd)", category: "transitions", description: "Transitions between distant targets", parentId: "sk-trans", levelIntroduced: 3 },
   { id: "sk-trans-near-far", name: "Near-to-Far Transition", category: "transitions", description: "Transitioning from close to far target (distance changeup)", parentId: "sk-trans", levelIntroduced: 2 },
   { id: "sk-trans-far-near", name: "Far-to-Near Transition", category: "transitions", description: "Transitioning from far to close target", parentId: "sk-trans", levelIntroduced: 2 },
-  { id: "sk-trans-wide", name: "Wide Transition (90°+)", category: "transitions", description: "Large-angle transitions between target arrays", parentId: "sk-trans", levelIntroduced: 3 },
+  { id: "sk-trans-wide", name: "Wide Transition (90°+)", category: "transitions", description: "Large-angle transitions between target arrays", parentId: "sk-trans", prerequisites: ["sk-trans", "sk-move-short"], levelIntroduced: 3 },
   { id: "sk-trans-exit-entry", name: "Transition Exit/Entry", category: "transitions", description: "Visual pickup timing when leaving and arriving at targets", parentId: "sk-trans", levelIntroduced: 2 },
   { id: "sk-trans-low", name: "Low Target Transitions", category: "transitions", description: "Transitioning to/from targets placed low (angled stands, ground level)", parentId: "sk-trans", levelIntroduced: 2 },
   { id: "sk-trans-steel", name: "Steel/Paper Transitions", category: "transitions", description: "Transitioning between steel and paper targets — calling by sight, not sound", parentId: "sk-trans", levelIntroduced: 2 },
 
   // Reloads
   { id: "sk-reload-stand", name: "Standing Reload", category: "reloads", description: "Reloading while stationary", parentId: null, levelIntroduced: 1 },
-  { id: "sk-reload-move", name: "Reload on the Move", category: "reloads", description: "Reloading while moving between positions", parentId: null, levelIntroduced: 3 },
-  { id: "sk-reload-entry", name: "Reload in Position Entry", category: "reloads", description: "Reloading while entering a shooting position", parentId: null, levelIntroduced: 3 },
+  { id: "sk-reload-move", name: "Reload on the Move", category: "reloads", description: "Reloading while moving between positions", parentId: null, prerequisites: ["sk-reload-stand", "sk-move-unmounted"], levelIntroduced: 3 },
+  { id: "sk-reload-entry", name: "Reload in Position Entry", category: "reloads", description: "Reloading while entering a shooting position", parentId: null, prerequisites: ["sk-reload-stand", "sk-move-entry"], levelIntroduced: 3 },
 
   // Movement
   { id: "sk-move-entry", name: "Position Entry", category: "movement", description: "Decelerating into a shooting position with proper stance", parentId: null, levelIntroduced: 2 },
   { id: "sk-move-exit", name: "Position Exit", category: "movement", description: "Accelerating out of position without false steps — start moving while engaging last target", parentId: null, levelIntroduced: 2 },
-  { id: "sk-move-mounted", name: "Mounted Movement", category: "movement", description: "Moving with gun up, blending positions (1-4 steps)", parentId: null, levelIntroduced: 3 },
+  { id: "sk-move-mounted", name: "Mounted Movement", category: "movement", description: "Moving with gun up, blending positions (1-4 steps)", parentId: null, prerequisites: ["sk-grip", "sk-sight", "sk-move-entry"], levelIntroduced: 3 },
   { id: "sk-move-unmounted", name: "Unmounted Movement", category: "movement", description: "Sprinting with gun down between positions (5+ steps)", parentId: null, levelIntroduced: 3 },
-  { id: "sk-move-shoot", name: "Shooting on the Move", category: "movement", description: "Engaging targets while moving (target-focused, reactive)", parentId: null, levelIntroduced: 3 },
-  { id: "sk-move-soft", name: "Soft Stops", category: "movement", description: "Brief pauses where center of gravity never fully stops", parentId: null, levelIntroduced: 4 },
-  { id: "sk-move-direction", name: "Direction Change", category: "movement", description: "Changing direction without drop steps", parentId: null, levelIntroduced: 3 },
+  { id: "sk-move-shoot", name: "Shooting on the Move", category: "movement", description: "Engaging targets while moving (target-focused, reactive)", parentId: null, prerequisites: ["sk-grip", "sk-cadence", "sk-move-entry"], levelIntroduced: 3 },
+  { id: "sk-move-soft", name: "Soft Stops", category: "movement", description: "Brief pauses where center of gravity never fully stops", parentId: null, prerequisites: ["sk-move-shoot", "sk-move-entry"], levelIntroduced: 4 },
+  { id: "sk-move-direction", name: "Direction Change", category: "movement", description: "Changing direction without drop steps", parentId: null, prerequisites: ["sk-move-entry", "sk-move-exit"], levelIntroduced: 3 },
   { id: "sk-move-short", name: "Short Moves", category: "movement", description: "Quick lateral moves of 2-3 steps while keeping gun mounted at eyeline", parentId: null, levelIntroduced: 2 },
   { id: "sk-move-prone", name: "Prone", category: "movement", description: "Getting into and shooting from prone position — knowing your POI shift", parentId: null, levelIntroduced: 3 },
   { id: "sk-move-lean", name: "Lean / Barricade", category: "movement", description: "Leaning around barricades to access targets while maintaining stable platform", parentId: null, levelIntroduced: 2 },
 
   // Stage craft
   { id: "sk-stage-plan", name: "Stage Planning", category: "stage_craft", description: "Planning target engagement order and movement", parentId: null, levelIntroduced: 2 },
-  { id: "sk-stage-hf", name: "Hit Factor Optimization", category: "stage_craft", description: "Speed vs. accuracy decision-making for scoring", parentId: null, levelIntroduced: 3 },
-  { id: "sk-stage-pressure", name: "Shooting Under Pressure", category: "stage_craft", description: "Maintaining performance under match stress", parentId: null, levelIntroduced: 2 },
-  { id: "sk-stage-classifier", name: "Classifier Execution", category: "stage_craft", description: "Cold performance on classifier stages", parentId: null, levelIntroduced: 2 },
+  { id: "sk-stage-hf", name: "Hit Factor Optimization", category: "stage_craft", description: "Speed vs. accuracy decision-making for scoring", parentId: null, prerequisites: ["sk-shot-call", "sk-pacing", "sk-discipline"], levelIntroduced: 3 },
+  { id: "sk-stage-pressure", name: "Shooting Under Pressure", category: "stage_craft", description: "Maintaining performance under match stress", parentId: null, prerequisites: ["sk-discipline", "sk-stage-plan"], levelIntroduced: 2 },
+  { id: "sk-stage-classifier", name: "Classifier Execution", category: "stage_craft", description: "Cold performance on classifier stages", parentId: null, prerequisites: ["sk-stage-hf", "sk-stage-pressure"], levelIntroduced: 2 },
   { id: "sk-stage-port", name: "Port Shooting", category: "stage_craft", description: "Engaging targets through ports and narrow openings — positioning, keeping gun out of port", parentId: null, levelIntroduced: 2 },
-  { id: "sk-stage-skip", name: "Skipping Targets", category: "stage_craft", description: "Complex engagement sequences where visible targets must be skipped from certain positions", parentId: "sk-stage-plan", levelIntroduced: 3 },
+  { id: "sk-stage-skip", name: "Skipping Targets", category: "stage_craft", description: "Complex engagement sequences where visible targets must be skipped from certain positions", parentId: "sk-stage-plan", prerequisites: ["sk-stage-plan", "sk-discipline"], levelIntroduced: 3 },
 
   // Single hand
-  { id: "sk-sho", name: "Strong Hand Only", category: "single_hand", description: "Shooting with dominant hand only", parentId: null, levelIntroduced: 1 },
-  { id: "sk-who", name: "Weak Hand Only", category: "single_hand", description: "Shooting with non-dominant hand only", parentId: null, levelIntroduced: 1 },
+  { id: "sk-sho", name: "Strong Hand Only", category: "single_hand", description: "Shooting with dominant hand only", parentId: null, prerequisites: ["sk-grip", "sk-trigger", "sk-recoil"], levelIntroduced: 1 },
+  { id: "sk-who", name: "Weak Hand Only", category: "single_hand", description: "Shooting with non-dominant hand only", parentId: null, prerequisites: ["sk-trigger", "sk-sight"], levelIntroduced: 1 },
   { id: "sk-one-hand-pickup", name: "One-Handed Pickup", category: "single_hand", description: "Establishing proper grip when picking up gun with one hand", parentId: null, levelIntroduced: 2 },
 
   // Other skills
