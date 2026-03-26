@@ -31,4 +31,4 @@ jobs:
       - name: Deploy
         run: |
           curl -sf -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            "http://95.216.205.160:8000/api/v1/deploy?uuid=gi1n0kx1fw6ha1r8txzy0ang&force=true"
+            "http://95.216.205.160:8000/api/v1/deploy?uuid=r2yvilzlf63weniad1vhr1jk&force=true"
