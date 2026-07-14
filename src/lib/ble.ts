@@ -25,7 +25,7 @@ type TimerEventListener = (event: TimerEvent) => void;
 // Convert 2-byte time value to seconds
 // Java reference uses signed bytes: int value = 256 * b1 + b2; if (b2 <= 0) value += 256; return value / 100.0
 // JS Uint8Array gives unsigned (0-255), must convert to signed (-128..127) to match Java
-function convertTime(b1: number, b2: number): number {
+export function convertTime(b1: number, b2: number): number {
   const s1 = b1 > 127 ? b1 - 256 : b1;
   const s2 = b2 > 127 ? b2 - 256 : b2;
   let value = 256 * s1 + s2;
