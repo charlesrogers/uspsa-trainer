@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths-ignore: ['*.md', 'docs/**']
 
+env:
+  APP_URL: https://uspsa.imprevista.com
+  COOLIFY_API: http://95.216.205.160:8000/api/v1
+  IMAGE: ghcr.io/charlesrogers/uspsa-trainer
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -12,6 +17,26 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
+      # Test + build gate: type errors, failing tests and build errors fail here
+      # in ~1 min instead of surfacing as a slow, opaque Docker build failure —
+      # or worse, shipping. Nothing reaches GHCR until this passes.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build gate (next build)
+        run: pnpm build
+
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -24,11 +49,60 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/charlesrogers/uspsa-trainer:latest
-            ghcr.io/charlesrogers/uspsa-trainer:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Deploy
+
+      - name: Trigger Coolify deploy
         run: |
-          curl -sf -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            "http://95.216.205.160:8000/api/v1/deploy?uuid=r2yvilzlf63weniad1vhr1jk&force=true"
+          if [ -z "${{ vars.COOLIFY_UUID }}" ]; then
+            echo "::error::COOLIFY_UUID repo variable is not set (gh variable set COOLIFY_UUID -R charlesrogers/uspsa-trainer)"
+            exit 1
+          fi
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            "${{ env.COOLIFY_API }}/deploy?uuid=${{ vars.COOLIFY_UUID }}&force=true")
+          echo "Coolify deploy response: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::Coolify deploy trigger returned $STATUS"
+            exit 1
+          fi
+
+      # The live site must serve THIS commit. A 200 proves nothing on its own —
+      # a Next.js error boundary returns 200 while every request errors.
+      - name: Verify deploy is live
+        run: |
+          for i in $(seq 1 20); do
+            LIVE_SHA=$(curl -sf --max-time 10 "${{ env.APP_URL }}/api/version" \
+              | jq -r '.sha // empty' 2>/dev/null || true)
+            echo "attempt $i/20 — live sha: ${LIVE_SHA:-<unreachable>} | want: ${{ github.sha }}"
+            if [ "$LIVE_SHA" = "${{ github.sha }}" ]; then
+              echo "${{ env.APP_URL }} is serving ${{ github.sha }}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::${{ env.APP_URL }} never served ${{ github.sha }} after 20 polls (~200s)"
+          exit 1
+
+      - name: Dump container logs and alert on failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          echo "=== Coolify container logs (last 100 lines) ==="
+          curl -s -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            "${{ env.COOLIFY_API }}/applications/${{ vars.COOLIFY_UUID }}/logs?lines=100" \
+            | jq -r '.logs // "no logs returned"' || echo "could not fetch container logs"
+
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "::warning::DISCORD_WEBHOOK secret is not set — no alert sent. Failed deploys are silent until it is."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sf -X POST "$DISCORD_WEBHOOK" -H 'Content-Type: application/json' \
+            -d "$(jq -n --arg content "🔴 **uspsa-trainer deploy FAILED** — \`${GITHUB_SHA:0:7}\` is not live on ${{ env.APP_URL }}. Logs: $RUN_URL" '{content: $content}')" \
+            || echo "::warning::Discord alert failed to send"

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches-ignore: [main] # main is covered by the deploy workflow's gate
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Lint is REPORT-ONLY for now. The app code carries 26 pre-existing errors
+      # (mostly react-hooks/set-state-in-effect in page components) that predate
+      # this workflow. M0 is a characterization milestone — it pins behavior and
+      # changes none of it — so clearing that debt is deliberately out of scope
+      # rather than smuggled in here. Flip continue-on-error off once it's clean.
+      - name: Lint (report-only)
+        run: pnpm lint
+        continue-on-error: true
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      # A cron or CI job with no failure alert is a job that is already dead —
+      # you just don't know the date yet. Guarded so it no-ops until the secret
+      # exists rather than failing the run.
+      - name: Alert on failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "::warning::DISCORD_WEBHOOK secret is not set — no alert sent. Failed CI runs are silent until it is."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sf -X POST "$DISCORD_WEBHOOK" -H 'Content-Type: application/json' \
+            -d "$(jq -n --arg content "🔴 **uspsa-trainer CI FAILED** on \`${GITHUB_REF_NAME}\` (\`${GITHUB_SHA:0:7}\`). $RUN_URL" '{content: $content}')" \
+            || echo "::warning::Discord alert failed to send"

@@ -16,5 +16,9 @@ COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
+# Served by /api/version so the deploy workflow can prove the live site is
+# running this commit, not an older image that still returns 200.
+ARG GIT_SHA=dev
+ENV APP_VERSION=$GIT_SHA
 EXPOSE 3000
 CMD ["npm", "start"]
