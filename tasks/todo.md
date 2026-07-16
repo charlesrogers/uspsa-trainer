@@ -1,89 +1,64 @@
-# M1 — Data Durability
+# M2 — Accounts & Cloud Sync (AIRTIGHT — sync bugs eat user data)
 
-Goal: user training data survives a cleared browser cache. Build the storage
-layer M2's server/sync will attach to. No real user data exists yet, so the
-localStorage→IndexedDB migration is for correctness/future users, not rescue.
+Roadmap decisions are FIXED (do not revisit): local-first + server-mirror;
+IndexedDB stays the UI source of truth; runs/sessions append-only +
+field-patchable; per-row `updated_at` (server clock) last-write-wins; soft
+deletes (`deleted_at`); anonymous-first (never forced); client UUIDs are PKs
+forever (no id remapping). Schema `uspsa` on self-hosted Supabase.
 
-## Architecture decision (write-through cache)
+## ⛔ Infra gates — ASK CHARLES before any of these (build first, apply later)
+- [ ] Create `uspsa` schema + tables on the shared Supabase (capacity/other-apps)
+- [ ] Configure magic-link SMTP on Supabase auth
+- [ ] Run the RLS two-user test against the real dev instance
+Everything below the gates is built and tested WITHOUT the server, then applied.
 
-The compute engine (skillEstimation, trends, recommendations, sessionPlanner,
-assessment) reads the store *synchronously* all over the UI. Making those async
-would ripple through the entire lib and turn pure computation into IO. Instead:
+## M2.1 — Schema + mapper  (server-agnostic; build now)
+- [ ] `migrations/0001_uspsa_sync.sql`: schema `uspsa`; tables profiles/sessions/
+      runs/plans mirroring src/lib/store.ts + user_id/updated_at/deleted_at;
+      snake_case; `updated_at` via BEFORE trigger `now()` (never client-set);
+      RLS `user_id = auth.uid()` select/insert/update; NO delete policy.
+- [ ] `src/lib/sync/mapper.ts`: toDb/fromDb for profile/session/run/plan. Tests:
+      round-trip every type; snake/camel exactness; splits + nullable fields.
 
-- **`src/lib/storage/db.ts`** — async `idb` wrapper. THE durable source of truth.
-  Object stores: `profile`, `sessions`, `runs`, `plans`, `meta`.
-- **`src/lib/store.ts`** — holds an in-memory cache mirroring idb.
-  - `hydrateStore()` async — migrate localStorage→idb once, then load idb→cache.
-  - reads (getRuns/getProfile/…) stay **sync**, read cache → engine untouched.
-  - writes (addRun/saveProfile/…) update cache **sync**, persist to idb **async**
-    through one choke-point that catches QuotaExceededError → banner.
-- Hydration gate in AppShell: content waits for `hydrateStore()` on cold load
-  (near-instant), so pages' existing useEffect reads hit a populated cache.
+## M2.2 — Auth (magic link only; no OAuth/password this milestone)
+- [ ] Supabase browser client (`src/lib/sync/supabase.ts`), env-var keyed
+- [ ] Sign up / sign in (magic link) + signed-in state in Settings
+- [ ] Sync status line: "up to date / N pending / offline"
 
-This keeps all 172 M0 tests' assertions unchanged (only harness internals move
-from localStorage to the cache). New idb/migration/export behavior gets its own
-M1 tests using fake-indexeddb.
+## M2.3 — Sync engine (`src/lib/sync/engine.ts`) — THE risky part
+- [ ] Outbox store in IndexedDB: every local write appends {table,id,updated_at}
+- [ ] Cycle: push outbox (idempotent upsert by PK) → pull where server
+      updated_at > watermark → merge into IndexedDB (LWW per row)
+- [ ] Triggers: app start, `online` event, session end, manual "Sync now".
+      NOT per-write.
+- [ ] Failure: outbox persists across restarts; errors non-blocking indicator
+- [ ] Exhaustive tests (against a fake Supabase, no server needed for logic):
+  - [ ] fresh-device pull rebuilds identical local state
+  - [ ] two-device LWW converges
+  - [ ] offline queue survives restart
+  - [ ] partial-push failure retries idempotently (upsert by PK)
+  - [ ] soft delete propagates
+  - [ ] clock skew (client +1hr) cannot resurrect deleted rows — trust server
+        updated_at from the DB trigger, never client time
 
-## Tasks
+## M2.4 — Account upgrade path
+- [ ] Local anon data + fresh sign-in → everything uploads
+- [ ] Sign-in on device with BOTH local anon data AND existing server data →
+      merge by id, zero loss, no dupes (UUIDs). Test both.
 
-### M1.1 — Storage layer
-- [ ] `storage/db.ts`: idb schema v1, stores profile/sessions/runs/plans/meta, `migrate(from)` scaffold
-- [ ] `store.ts`: in-memory cache + `hydrateStore()` + sync reads + async writes via choke-point
-- [ ] One-time localStorage→idb migration; keep originals renamed `_migrated_*` (no delete)
-- [ ] QuotaExceededError → pub/sub → visible banner in AppShell (no silent dropped writes)
-- [ ] Route remaining direct localStorage users through the layer: settings export, `ble.ts` last-device
-- [ ] Move constraints / session plan / plan progress / imported matches into idb stores
-- [ ] Hydration gate in AppShell (existing empty states, no spinner sprawl)
+## Acceptance (roadmap)
+- [ ] Airplane-mode capture → reconnect → rows in Supabase (psql output in PR)
+- [ ] Second browser profile → identical history + skill estimates
+- [ ] RLS: user A JWT selecting user B rows → 0 rows (automated, real instance)
+- [ ] Sync suite green
+- [ ] Zero secrets in git (`git log -p | grep -iE 'service_role|anon.*eyJ'` clean)
 
-### M1.2 — Export / Import (Settings)
-- [ ] Export → `uspsa-trainer-backup-YYYY-MM-DD.json` (schema version + profile/sessions/runs/plans + app version), pretty-printed
-- [ ] Import → validate schema + referential integrity BEFORE writing; merge by id (existing wins); summary + confirm tap
-- [ ] Reject corrupt/truncated JSON with a readable error and zero writes
+---
 
-### M1.3 — Run validation
-- [ ] `validation.ts` `validateRun(run): string[]` — time (0.3,600), splits >0.05 & monotonic-consistent, pointsDown [0,rounds×5], callPct [0,100], distance [1,100]
-- [ ] Wire into manual entry + BLE capture; block with specific message; "save anyway, marked invalid" → isValid:false
+## Parallel thread — population benchmarks (NOT M2; awaiting Charles sign-off)
+- [ ] Drill data-source categorization (below) — Charles to approve
+- [ ] PractiScore ingestion feasibility spike (API vs scrape vs USPSA data; ToS)
+- [ ] Only ~3 drills are PractiScore-derivable (classifier/El Prez/mock stage);
+      the rest need our own users. Design so both sources feed findBenchmark().
 
-### Tests
-- [ ] Adapt M0 harness to cache (assertions unchanged)
-- [ ] idb round-trip: write → drop cache → hydrate → present
-- [ ] Export → wipe all → import → `computeAllSkillEstimates()` output identical (snapshot)
-- [ ] Legacy migration via fake-indexeddb + seeded localStorage
-- [ ] Import rejects corrupt JSON / referential breaks with zero writes
-- [ ] validateRun boundaries, both sides
-
-### Gate
-- [ ] `pnpm typecheck && pnpm test && pnpm build` green; coverage still ≥80% on src/lib
-
-## Review
-
-Done. IndexedDB (`storage/db.ts`) is the durable source of truth; `store.ts`
-mirrors it in a write-through cache so the compute engine stayed 100%
-synchronous and untouched. Reads are sync (cache); writes update the cache
-synchronously and persist async through one choke-point that raises a visible
-banner on QuotaExceededError. `flushPendingWrites()` lets durability be awaited
-(tests + a flush on tab-hide).
-
-- Migration: one-time localStorage→idb copy, idempotent, originals preserved as
-  `_migrated_*` (never deleted).
-- Export/import (`backup.ts`): validates schema + shape + referential integrity
-  before any write; merges by id (existing wins); rejects corrupt/newer/dangling
-  with zero writes.
-- Validation (`validation.ts`): `validateRun()` wired into manual entry with a
-  "Fix it / Save anyway (marked invalid)" gate.
-- Feature modules (recommendations/sessionPlanner/practiscore/ble) moved off
-  localStorage onto the store's typed kv — no import cycles.
-
-Tests: 198 total (193 pass, 5 quarantined corpus gaps from M0). New durability/
-migration/backup/validation suites exercise the real idb path via fake-indexeddb.
-Coverage 95.66% lines on src/lib. typecheck + next build green; prod server
-smoke-tested (/, /settings → 200).
-
-Design note: writes return void (fire-and-forget persist) rather than the fully
-async store the roadmap sketches — this keeps the sync engine and avoids
-rippling async through every page. Durability window is one microtask; the
-tab-hide flush covers the close-immediately case.
-
-Lint: still report-only. The set-state-in-effect errors are the pre-existing
-M0 pattern (page components), plus the one I followed in AppShell's hydrate
-effect. Clearing that debt remains out of scope for a durability milestone.
+## Review (filled at end)
