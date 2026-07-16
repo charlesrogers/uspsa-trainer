@@ -3,16 +3,40 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getProfile } from "@/lib/store";
+import { getProfile, hydrateStore, onStorageFull, isStorageFull, flushPendingWrites } from "@/lib/store";
 import { useBle } from "@/lib/useBle";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [classification, setClassification] = useState("C");
   const [initials, setInitials] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+  const [storageFull, setStorageFull] = useState(false);
   const { state: bleState, deviceName: bleDevice } = useBle();
 
+  // Load IndexedDB into the store cache once, before content renders. Until then
+  // the page's own empty state would show stale defaults, so we gate on it.
   useEffect(() => {
+    let active = true;
+    hydrateStore().finally(() => {
+      if (active) setHydrated(true);
+    });
+    setStorageFull(isStorageFull());
+    const unsub = onStorageFull(() => setStorageFull(true));
+    // Best-effort durability: flush pending writes when the tab is hidden.
+    const onHide = () => {
+      if (document.visibilityState === "hidden") void flushPendingWrites();
+    };
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      active = false;
+      unsub();
+      document.removeEventListener("visibilitychange", onHide);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     const p = getProfile();
     setClassification(p.classification);
     const name = p.displayName || "";
@@ -24,7 +48,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         .toUpperCase()
         .slice(0, 2)
     );
-  }, [pathname]);
+  }, [pathname, hydrated]);
 
   const isActive = (path: string) => {
     if (path === "/") return pathname === "/";
@@ -128,8 +152,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto pb-24">{children}</main>
+      {/* Storage-full banner — a dropped write must never be silent */}
+      {storageFull && (
+        <div
+          className="px-4 py-2 text-[12px] font-medium text-center"
+          style={{ background: "#7f1d1d", color: "#fecaca" }}
+        >
+          Storage is full — new data may not be saved.{" "}
+          <Link href="/settings" className="underline">
+            Export your backup
+          </Link>{" "}
+          to free space.
+        </div>
+      )}
+
+      {/* Main content — gated on hydration so pages read populated data */}
+      <main className="flex-1 overflow-y-auto pb-24">{hydrated ? children : null}</main>
 
       {/* Bottom Navigation */}
       {!hideNav && (

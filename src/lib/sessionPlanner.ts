@@ -2,7 +2,7 @@
 // Generates structured, timed session plans from the recommendation engine
 
 import { generateRecommendations, type SessionConstraints, type DrillRecommendation } from "./recommendations";
-import { getDrill, skills } from "./store";
+import { getDrill, skills, getPlanValue, setPlanValue, removePlanValue } from "./store";
 
 export interface PlannedDrill {
   drillId: string;
@@ -29,7 +29,7 @@ export interface SessionPlan {
   constraints: SessionConstraints;
 }
 
-const STORAGE_KEY = "uspsa_session_plan";
+const PLAN_KEY = "session_plan";
 
 // Time per rep estimates (minutes)
 function timePerRep(drillId: string, fireMode: "live_fire" | "dry_fire"): number {
@@ -247,30 +247,21 @@ export function swapDrill(plan: SessionPlan, drillIndex: number, replacement: Dr
   return { ...plan, drills: newDrills, estimatedRounds, totalMinutes };
 }
 
-// localStorage persistence
+// Persistence via the durable store (IndexedDB-backed cache).
 export function savePlan(plan: SessionPlan) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
+  setPlanValue(PLAN_KEY, plan);
 }
 
 export function loadPlan(): SessionPlan | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+  return getPlanValue<SessionPlan | null>(PLAN_KEY, null);
 }
 
 export function clearPlan() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(STORAGE_KEY);
+  removePlanValue(PLAN_KEY);
 }
 
 // Track progress through a plan during active session
-const PROGRESS_KEY = "uspsa_plan_progress";
+const PROGRESS_KEY = "plan_progress";
 
 export interface PlanProgress {
   planId: string;
@@ -280,22 +271,13 @@ export interface PlanProgress {
 }
 
 export function savePlanProgress(progress: PlanProgress) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  setPlanValue(PROGRESS_KEY, progress);
 }
 
 export function loadPlanProgress(): PlanProgress | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(PROGRESS_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+  return getPlanValue<PlanProgress | null>(PROGRESS_KEY, null);
 }
 
 export function clearPlanProgress() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(PROGRESS_KEY);
+  removePlanValue(PROGRESS_KEY);
 }

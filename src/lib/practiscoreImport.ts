@@ -1,6 +1,7 @@
 // PractiScore Import — parse CSV/text match data and convert to Session + SessionRun format
 
 import type { Session, SessionRun } from "./store";
+import { getMetaValue, setMetaValue } from "./store";
 
 // ─────────────────────────────────────────
 // TYPES
@@ -44,16 +45,14 @@ export interface ImportedMatch {
 // ─────────────────────────────────────────
 // STORAGE — imported match history
 // ─────────────────────────────────────────
-const IMPORTED_MATCHES_KEY = "uspsa_imported_matches";
+const IMPORTED_MATCHES_KEY = "imported_matches";
 
 export function getImportedMatches(): ImportedMatch[] {
-  if (typeof window === "undefined") return [];
-  const raw = localStorage.getItem(IMPORTED_MATCHES_KEY);
-  return raw ? JSON.parse(raw) : [];
+  return getMetaValue<ImportedMatch[]>(IMPORTED_MATCHES_KEY, []);
 }
 
 function saveImportedMatches(matches: ImportedMatch[]) {
-  localStorage.setItem(IMPORTED_MATCHES_KEY, JSON.stringify(matches));
+  setMetaValue(IMPORTED_MATCHES_KEY, matches);
 }
 
 export function addImportedMatch(match: ImportedMatch) {

@@ -1,15 +1,19 @@
 // Shared test harness.
 //
-// store.ts and friends read the browser globals `window` and `localStorage`
-// directly. Rather than pull in a DOM environment (jsdom is not on M0's
-// approved dependency list), we stub both globals with an in-memory Storage.
+// M1: the store now reads from an in-memory cache backed by IndexedDB, not
+// localStorage. Engine tests seed that cache directly and synchronously via the
+// store's __seed hook — the compute math is identical regardless of how the
+// data got there, and this keeps the M0 assertions untouched. The real
+// IndexedDB/migration/export paths are exercised in storage.test.ts using
+// fake-indexeddb.
 
+import "fake-indexeddb/auto"; // gives write-through persistence somewhere to go
 import { vi } from "vitest";
 import type { Session, SessionRun } from "../store";
+import { __resetCacheForTests, __seedCacheForTests } from "../store";
 
 class MemoryStorage implements Storage {
   private map = new Map<string, string>();
-
   get length() {
     return this.map.size;
   }
@@ -30,7 +34,9 @@ class MemoryStorage implements Storage {
   }
 }
 
+/** Reset the store cache and stub browser globals. Call in beforeEach. */
 export function installBrowserEnv(): Storage {
+  __resetCacheForTests();
   const storage = new MemoryStorage();
   vi.stubGlobal("localStorage", storage);
   vi.stubGlobal("window", { localStorage: storage });
@@ -78,15 +84,16 @@ export function makeSession(overrides: Partial<Session> = {}): Session {
   };
 }
 
-/** Write runs straight to the backing store the way the app persists them. */
+// Seed the store cache directly (synchronous). Sessions are stored newest-first
+// to match createSession()'s ordering.
 export function seedRuns(runs: SessionRun[]) {
-  localStorage.setItem("uspsa_runs", JSON.stringify(runs));
+  __seedCacheForTests({ runs });
 }
 
 export function seedSessions(sessions: Session[]) {
-  localStorage.setItem("uspsa_sessions", JSON.stringify(sessions));
+  __seedCacheForTests({ sessions });
 }
 
 export function seedProfile(profile: Record<string, unknown>) {
-  localStorage.setItem("uspsa_profile", JSON.stringify(profile));
+  __seedCacheForTests({ profile });
 }

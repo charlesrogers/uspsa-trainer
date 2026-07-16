@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { getProfile, saveProfile, createSession, addRun, getSessions, getRuns } from "@/lib/store";
+import { getProfile, saveProfile, createSession, addRun, flushPendingWrites } from "@/lib/store";
 import type { UserProfile } from "@/lib/store";
+import { buildBackup, serializeBackup, parseBackup, importBackup, backupFilename, type ImportSummary } from "@/lib/backup";
+import { APP_VERSION } from "@/lib/version";
 import { useBle } from "@/lib/useBle";
 import {
   parsePractiScoreCSV,
@@ -411,9 +413,42 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const ble = useBle();
 
+  // Backup import/export UI state.
+  const importFileRef = useRef<HTMLInputElement>(null);
+  const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
   useEffect(() => {
     setProfile(getProfile());
   }, []);
+
+  const handleExport = async () => {
+    await flushPendingWrites(); // ensure the newest writes are in the snapshot
+    const now = new Date().toISOString();
+    const json = serializeBackup(buildBackup(APP_VERSION, now));
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = backupFilename(now);
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = async (file: File) => {
+    setImportError(null);
+    setImportSummary(null);
+    try {
+      const text = await file.text();
+      const snapshot = parseBackup(text); // validates fully before any write
+      const summary = importBackup(snapshot);
+      await flushPendingWrites();
+      setImportSummary(summary);
+      setProfile(getProfile()); // reflect a restored profile in the form
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : "Import failed.");
+    }
+  };
 
   if (!profile) return null;
 
@@ -665,31 +700,53 @@ export default function SettingsPage() {
 
       {/* Data */}
       <div className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-4 mb-4">
-        <h3 className="font-semibold mb-3">Data</h3>
+        <h3 className="font-semibold mb-1">Backup</h3>
+        <p className="text-xs text-surface-400 mb-3">
+          Your training history lives on this device. Export a backup regularly — importing
+          merges by run, so restoring never overwrites data you already have.
+        </p>
         <div className="space-y-2">
           <button
-            onClick={() => {
-              const data = {
-                profile: getProfile(),
-                sessions: JSON.parse(localStorage.getItem("uspsa_sessions") || "[]"),
-                runs: JSON.parse(localStorage.getItem("uspsa_runs") || "[]"),
-              };
-              const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `uspsa-trainer-export-${new Date().toISOString().slice(0, 10)}.json`;
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
+            onClick={handleExport}
             className="w-full text-left px-3 py-2 hover:bg-[var(--bg-elevated)] rounded-lg text-sm flex items-center justify-between"
           >
-            <span>Export all data (JSON)</span>
+            <span>Export backup (JSON)</span>
             <svg className="w-4 h-4 text-surface-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
           </button>
+          <button
+            onClick={() => importFileRef.current?.click()}
+            className="w-full text-left px-3 py-2 hover:bg-[var(--bg-elevated)] rounded-lg text-sm flex items-center justify-between"
+          >
+            <span>Import backup</span>
+            <svg className="w-4 h-4 text-surface-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M4 4v5h.582m0 0a8.001 8.001 0 0115.356 2M4.582 9H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+          <input
+            ref={importFileRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImportFile(file);
+              e.target.value = ""; // allow re-importing the same file
+            }}
+          />
         </div>
+        {importSummary && (
+          <p className="text-xs text-green-400 mt-3">
+            Imported {importSummary.importedRuns} run{importSummary.importedRuns === 1 ? "" : "s"} and{" "}
+            {importSummary.importedSessions} session{importSummary.importedSessions === 1 ? "" : "s"}
+            {importSummary.skippedRuns > 0 ? `, skipped ${importSummary.skippedRuns} duplicate run${importSummary.skippedRuns === 1 ? "" : "s"}` : ""}
+            {importSummary.profileRestored ? ", restored profile" : ""}.
+          </p>
+        )}
+        {importError && (
+          <p className="text-xs text-red-400 mt-3 whitespace-pre-line">{importError}</p>
+        )}
       </div>
 
       {/* PractiScore Import */}
