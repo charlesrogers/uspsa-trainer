@@ -15,6 +15,7 @@ import {
   computeClassificationPct,
 } from "@/lib/store";
 import type { Session, SessionRun } from "@/lib/store";
+import { validateRun } from "@/lib/validation";
 import { generateId, formatTime, pctColor } from "@/lib/utils";
 import { useBle, useShotData } from "@/lib/useBle";
 import type { ShotData } from "@/lib/ble";
@@ -63,6 +64,10 @@ function ActiveSessionPage() {
   const [callGood, setCallGood] = useState("");
   const [callTotal, setCallTotal] = useState("");
   const [timerWaiting, setTimerWaiting] = useState(false);
+  // Validation gate: a run failing validateRun() is held here until the user
+  // fixes it or chooses to save it anyway (marked invalid).
+  const [validationIssues, setValidationIssues] = useState<string[] | null>(null);
+  const [pendingRun, setPendingRun] = useState<SessionRun | null>(null);
 
   // BLE timer integration
   const ble = useBle();
@@ -272,7 +277,23 @@ function ActiveSessionPage() {
       capturedAt: new Date().toISOString(),
     };
 
+    // A bad run silently poisons every downstream skill estimate — gate it.
+    const issues = validateRun(run);
+    if (issues.length > 0) {
+      setValidationIssues(issues);
+      setPendingRun(run);
+      return;
+    }
+    commitRun(run);
+  };
+
+  // Persist a run and advance form/plan state. Shared by the clean-save path and
+  // the "save anyway" path (which marks the run invalid).
+  const commitRun = (run: SessionRun) => {
+    if (!session) return;
     addRun(run);
+    setValidationIssues(null);
+    setPendingRun(null);
 
     // Check if we've done enough reps for this planned drill
     if (plan && planProgress) {
@@ -824,6 +845,36 @@ function ActiveSessionPage() {
               </div>
               <div className="font-mono text-lg font-bold text-surface-800">
                 {formatTime(benchmark.targetTime)}s
+              </div>
+            </div>
+          )}
+
+          {validationIssues && pendingRun && (
+            <div className="mb-3 rounded-xl border border-amber-500/40 bg-amber-950/40 p-3">
+              <p className="text-[13px] font-semibold text-amber-300 mb-1">
+                This run looks off:
+              </p>
+              <ul className="text-[12px] text-amber-200/90 list-disc pl-4 space-y-0.5 mb-3">
+                {validationIssues.map((issue, i) => (
+                  <li key={i}>{issue}</li>
+                ))}
+              </ul>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setValidationIssues(null);
+                    setPendingRun(null);
+                  }}
+                  className="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 rounded-lg text-sm transition-colors"
+                >
+                  Fix it
+                </button>
+                <button
+                  onClick={() => commitRun({ ...pendingRun, isValid: false })}
+                  className="px-3 py-2 bg-surface-100 hover:bg-surface-200 text-surface-600 font-medium rounded-lg text-sm transition-colors"
+                >
+                  Save anyway
+                </button>
               </div>
             </div>
           )}

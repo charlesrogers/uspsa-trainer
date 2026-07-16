@@ -3,7 +3,7 @@
 
 import { drills, skills, drillSkillMaps, allBenchmarks } from "./store";
 import { computeAllSkillEstimates, getDiagnosticNeeds, type SkillEstimate } from "./skillEstimation";
-import { getProfile } from "./store";
+import { getProfile, getPlanValue, setPlanValue } from "./store";
 
 export interface SessionConstraints {
   fireMode: "dry_fire" | "live_fire";
@@ -38,15 +38,13 @@ const DEFAULT_CONSTRAINTS: SessionConstraints = {
   maxDistance: 25,
 };
 
-// Save/load constraints from localStorage
+// Constraints persist via the durable store (IndexedDB-backed cache).
 export function getConstraints(): SessionConstraints {
-  if (typeof window === "undefined") return DEFAULT_CONSTRAINTS;
-  const raw = localStorage.getItem("uspsa_constraints");
-  return raw ? { ...DEFAULT_CONSTRAINTS, ...JSON.parse(raw) } : DEFAULT_CONSTRAINTS;
+  return { ...DEFAULT_CONSTRAINTS, ...getPlanValue<Partial<SessionConstraints>>("constraints", {}) };
 }
 
 export function saveConstraints(c: SessionConstraints) {
-  localStorage.setItem("uspsa_constraints", JSON.stringify(c));
+  setPlanValue("constraints", c);
 }
 
 // ─── Drill filtering ───

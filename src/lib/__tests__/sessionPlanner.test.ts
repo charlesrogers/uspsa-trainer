@@ -114,10 +114,10 @@ describe("persistence", () => {
     expect(loadPlan()).toBeNull();
   });
 
-  it("returns null rather than throwing on corrupt stored JSON", () => {
-    localStorage.setItem("uspsa_session_plan", "{not json");
+  it("returns null when no plan or progress is stored", () => {
+    // Plan/progress now persist as structured clones in IndexedDB, so there is
+    // no JSON string to corrupt here; the parse-failure concern moved to Import.
     expect(loadPlan()).toBeNull();
-    localStorage.setItem("uspsa_plan_progress", "{not json");
     expect(loadPlanProgress()).toBeNull();
   });
 

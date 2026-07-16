@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { installBrowserEnv, uninstallBrowserEnv, makeRun, makeSession, seedRuns, seedSessions } from "./harness";
+import { installBrowserEnv, uninstallBrowserEnv, makeRun, makeSession, seedRuns, seedSessions, seedProfile } from "./harness";
 import {
   getProfile, saveProfile,
   getSessions, createSession, endSession,
@@ -22,7 +22,8 @@ describe("profile", () => {
   });
 
   it("merges stored values over defaults (partial profiles survive)", () => {
-    localStorage.setItem("uspsa_profile", JSON.stringify({ displayName: "Charles" }));
+    // A partial profile (e.g. from an older schema) keeps every default field.
+    seedProfile({ displayName: "Charles" });
     const p = getProfile();
     expect(p.displayName).toBe("Charles");
     expect(p.targetClassification).toBe("B"); // default preserved

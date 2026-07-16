@@ -3,6 +3,8 @@
 // Uses Nordic UART Service (NUS) for communication
 // Protocol reverse-engineered from https://github.com/DenisZhadan/AmgLabCommander
 
+import { getMetaValue, setMetaValue } from "./store";
+
 const NUS_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 const NUS_RX_CHAR_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"; // Write to timer
 const NUS_TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"; // Notifications from timer
@@ -122,7 +124,7 @@ class LabCommanderBLE {
       this.txChar.addEventListener("characteristicvaluechanged", this.handleNotification);
 
       this.setState("connected");
-      localStorage.setItem("ble_last_device", this._deviceName || "");
+      setMetaValue("ble_last_device", this._deviceName || "");
     } catch (err) {
       this.setState("disconnected");
       throw err;
@@ -276,6 +278,5 @@ export const timer = new LabCommanderBLE();
 
 // Convenience hook helpers
 export function getLastPairedDevice(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("ble_last_device") || null;
+  return getMetaValue<string | null>("ble_last_device", null) || null;
 }
