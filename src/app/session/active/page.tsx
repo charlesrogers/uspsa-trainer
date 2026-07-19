@@ -16,6 +16,7 @@ import {
 } from "@/lib/store";
 import type { Session, SessionRun } from "@/lib/store";
 import { validateRun } from "@/lib/validation";
+import { useWakeLock } from "@/lib/useWakeLock";
 import { generateId, formatTime, pctColor } from "@/lib/utils";
 import { useBle, useShotData } from "@/lib/useBle";
 import type { ShotData } from "@/lib/ble";
@@ -48,6 +49,9 @@ function ActiveSessionPage() {
   const [elapsed, setElapsed] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [classification, setClassification] = useState("B");
+
+  // Keep the screen awake for the duration of an active session.
+  useWakeLock(!!session);
 
   // Plan state
   const [plan, setPlan] = useState<SessionPlan | null>(null);

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AppShell from "./components/AppShell";
+import ServiceWorker from "./components/ServiceWorker";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="max-w-md mx-auto min-h-screen flex flex-col">
         <AppShell>{children}</AppShell>
+        <ServiceWorker />
       </body>
     </html>
   );
