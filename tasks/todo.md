@@ -6,16 +6,15 @@ field-patchable; per-row `updated_at` (server clock) last-write-wins; soft
 deletes (`deleted_at`); anonymous-first (never forced); client UUIDs are PKs
 forever (no id remapping). Schema `uspsa` on self-hosted Supabase.
 
-## ⛔ Infra gates — ASK CHARLES (blocked; need explicit go)
-- [ ] Apply migration → create `uspsa` schema on shared Supabase. Charles OK'd
-      "supabase since it's free", but the auto-mode classifier blocked the write
-      to the shared prod host — needs explicit authorization (or he runs it, or
-      a permission rule). Isolated schema, no restart, reversible (drop schema).
+## ⛔ Infra gates
+- [x] Apply migration → `uspsa` schema on shared Supabase. APPLIED & VERIFIED
+      2026-07-19 (Charles ran it via `!`): 4 tables, RLS on all, 3 policies each
+      (no delete), updated_at triggers present. SQL now proven against real PG.
 - [ ] Expose `uspsa` to PostgREST: env is `public,storage,graphql_public` →
       add `,uspsa` + restart supabase-rest. THIS BLIPS ALL APPS' API briefly.
-      Pick a coordinated moment.
+      Pick a coordinated moment. Needed before the real end-to-end sync test.
 - [ ] Configure magic-link SMTP on Supabase auth (Charles said yes) — do in M2.2
-- [ ] RLS two-user test against the real instance
+- [ ] RLS two-user test against the real instance (after exposure)
 
 ## M2.1 — Schema + mapper  ✅ built (migration not yet applied)
 - [x] `migrations/0001_uspsa_sync.sql` — written, carefully; UNVERIFIED until run
