@@ -6,40 +6,38 @@ field-patchable; per-row `updated_at` (server clock) last-write-wins; soft
 deletes (`deleted_at`); anonymous-first (never forced); client UUIDs are PKs
 forever (no id remapping). Schema `uspsa` on self-hosted Supabase.
 
-## ⛔ Infra gates — ASK CHARLES before any of these (build first, apply later)
-- [ ] Create `uspsa` schema + tables on the shared Supabase (capacity/other-apps)
-- [ ] Configure magic-link SMTP on Supabase auth
-- [ ] Run the RLS two-user test against the real dev instance
-Everything below the gates is built and tested WITHOUT the server, then applied.
+## ⛔ Infra gates — ASK CHARLES (blocked; need explicit go)
+- [ ] Apply migration → create `uspsa` schema on shared Supabase. Charles OK'd
+      "supabase since it's free", but the auto-mode classifier blocked the write
+      to the shared prod host — needs explicit authorization (or he runs it, or
+      a permission rule). Isolated schema, no restart, reversible (drop schema).
+- [ ] Expose `uspsa` to PostgREST: env is `public,storage,graphql_public` →
+      add `,uspsa` + restart supabase-rest. THIS BLIPS ALL APPS' API briefly.
+      Pick a coordinated moment.
+- [ ] Configure magic-link SMTP on Supabase auth (Charles said yes) — do in M2.2
+- [ ] RLS two-user test against the real instance
 
-## M2.1 — Schema + mapper  (server-agnostic; build now)
-- [ ] `migrations/0001_uspsa_sync.sql`: schema `uspsa`; tables profiles/sessions/
-      runs/plans mirroring src/lib/store.ts + user_id/updated_at/deleted_at;
-      snake_case; `updated_at` via BEFORE trigger `now()` (never client-set);
-      RLS `user_id = auth.uid()` select/insert/update; NO delete policy.
-- [ ] `src/lib/sync/mapper.ts`: toDb/fromDb for profile/session/run/plan. Tests:
-      round-trip every type; snake/camel exactness; splits + nullable fields.
+## M2.1 — Schema + mapper  ✅ built (migration not yet applied)
+- [x] `migrations/0001_uspsa_sync.sql` — written, carefully; UNVERIFIED until run
+      (no local Postgres). Server-clock updated_at trigger, soft-delete, RLS.
+- [x] `src/lib/sync/mapper.ts` + 11 tests — round-trips every type, pins columns.
 
 ## M2.2 — Auth (magic link only; no OAuth/password this milestone)
 - [ ] Supabase browser client (`src/lib/sync/supabase.ts`), env-var keyed
 - [ ] Sign up / sign in (magic link) + signed-in state in Settings
 - [ ] Sync status line: "up to date / N pending / offline"
 
-## M2.3 — Sync engine (`src/lib/sync/engine.ts`) — THE risky part
-- [ ] Outbox store in IndexedDB: every local write appends {table,id,updated_at}
-- [ ] Cycle: push outbox (idempotent upsert by PK) → pull where server
-      updated_at > watermark → merge into IndexedDB (LWW per row)
-- [ ] Triggers: app start, `online` event, session end, manual "Sync now".
-      NOT per-write.
-- [ ] Failure: outbox persists across restarts; errors non-blocking indicator
-- [ ] Exhaustive tests (against a fake Supabase, no server needed for logic):
-  - [ ] fresh-device pull rebuilds identical local state
-  - [ ] two-device LWW converges
-  - [ ] offline queue survives restart
-  - [ ] partial-push failure retries idempotently (upsert by PK)
-  - [ ] soft delete propagates
-  - [ ] clock skew (client +1hr) cannot resurrect deleted rows — trust server
-        updated_at from the DB trigger, never client time
+## M2.3 — Sync engine (`src/lib/sync/engine.ts`) — ✅ ALGORITHM done + tested
+- [x] Decoupled engine behind RemoteClient/LocalStore interfaces
+- [x] Cycle: push outbox (idempotent upsert by pk) → pull > watermark → LWW merge
+- [x] Exhaustive matrix (10 tests, fake Supabase): fresh-device pull, two-device
+      LWW convergence, offline-queue-survives-restart, idempotent partial-push
+      retry, soft-delete propagation, clock-skew-can't-resurrect, watermark.
+- [ ] WIRE into store.ts (still to do, no-infra, testable w/ fake-indexeddb):
+      outbox idb store (schema v2), enqueue on every local write, apply-remote
+      path that writes cache+idb WITHOUT re-enqueuing, watermark/version meta.
+- [ ] Real supabase RemoteClient impl (`sync/supabase.ts`) — needs API exposed
+- [ ] Triggers: app start, `online`, session end, manual "Sync now" (not per-write)
 
 ## M2.4 — Account upgrade path
 - [ ] Local anon data + fresh sign-in → everything uploads
