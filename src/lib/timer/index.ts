@@ -6,10 +6,12 @@
 // Add native iOS (A4): return a CapacitorBleBackend from selectBackend() when
 // running natively. The connection orchestration is platform-agnostic.
 
+import { Capacitor } from "@capacitor/core";
 import { getMetaValue } from "../store";
 import type { TimerDriver, TimerTransport, BleBackend } from "./transport";
 import { amgDriver } from "./drivers/amg";
 import { WebBluetoothBackend } from "./bleBackend.web";
+import { CapacitorBleBackend } from "./bleBackend.native";
 import { BleTimerConnection } from "./bleConnection";
 
 /** Every timer the app can talk to. */
@@ -19,8 +21,8 @@ export const TIMER_DRIVERS: TimerDriver[] = [amgDriver];
 export const DEFAULT_DRIVER = amgDriver;
 
 function selectBackend(): BleBackend {
-  // A4: if (Capacitor.isNativePlatform()) return new CapacitorBleBackend();
-  return new WebBluetoothBackend();
+  // Native iOS → CoreBluetooth via Capacitor; everywhere else → Web Bluetooth.
+  return Capacitor.isNativePlatform() ? new CapacitorBleBackend() : new WebBluetoothBackend();
 }
 
 /** Build a transport for a specific timer. */
