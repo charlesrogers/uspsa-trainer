@@ -656,6 +656,13 @@ export const drills: Drill[] = [
   // DRY FIRE RELOADED DRILLS
   // ══════════════════════════════════════════
   {
+    id: "dr-draw", name: "Draw", sourceId: DFR, developer: null,
+    description: "Draw and fire ONE shot to an acceptable sight picture — times your draw to the first break. Dry-fire GM par: 0.7s at 7yd (0.6s from a speed holster; DFR p.20). Because it ends in a single shot, the AMG times it directly in dry fire.",
+    setupInstructions: "1 target at 7 yards. Hands relaxed at sides. On the beep, draw and fire one shot to an acceptable sight picture. Dry fire: put the AMG in its single-shot / dry sensitivity mode so it reads the break.",
+    roundCount: 1, targetCount: 1, distances: [7],
+    mode: "dry_fire", category: "marksmanship", levelIntroduced: 1,
+  },
+  {
     id: "dr-distance-draw", name: "Distance Draw", sourceId: DFR, developer: null,
     description: "Draw to sight picture appropriate for 25yd A-zone hit. Do NOT pull trigger — this isolates draw quality and sight alignment at distance. Par: 1.0s at 25yd, 1.3s at 50yd.",
     setupInstructions: "1 target at simulated 25 or 50 yards. Hands at sides. Draw and acquire sight picture appropriate for distance. Do NOT pull trigger. Check sight alignment quality.",
@@ -957,6 +964,10 @@ export const drillSkillMaps: DrillSkillMap[] = [
   { drillId: "dr-skip-targets", skillId: "sk-stage-plan", encompassingWeight: 0.8, isPrimary: false },
 
   // Dry Fire Reloaded drills
+  { drillId: "dr-draw", skillId: "sk-draw", encompassingWeight: 1.0, isPrimary: true },
+  { drillId: "dr-draw", skillId: "sk-draw-first", encompassingWeight: 1.0, isPrimary: false },
+  { drillId: "dr-draw", skillId: "sk-draw-speed", encompassingWeight: 0.9, isPrimary: false },
+  { drillId: "dr-draw", skillId: "sk-draw-grip", encompassingWeight: 0.7, isPrimary: false },
   { drillId: "dr-distance-draw", skillId: "sk-draw", encompassingWeight: 1.0, isPrimary: true },
   { drillId: "dr-distance-draw", skillId: "sk-confirm-3", encompassingWeight: 0.8, isPrimary: false },
   { drillId: "dr-distance-draw-sho", skillId: "sk-sho", encompassingWeight: 0.8, isPrimary: false },
@@ -1316,6 +1327,11 @@ export const dryFireBenchmarks: DrillBenchmark[] = [
 
   // ── New Dry Fire Reloaded drills ──
   // Distance Draw (no trigger pull)
+  // Draw (dry) — GM 0.7s is Ben's DFR par (p.20); B/M interpolated per the
+  // corpus convention until the population pull supplies real dry percentiles.
+  bDry("dr-draw", "GM", 7, 0.7, 0.7),
+  bDry("dr-draw", "M", 7, 0.8, 0.8),
+  bDry("dr-draw", "B", 7, 0.9, 0.9),
   bDry("dr-distance-draw", "B", 25, 1.3, 1.3),
   bDry("dr-distance-draw", "M", 25, 1.1, 1.1),
   bDry("dr-distance-draw", "GM", 25, 1.0, 1.0),
