@@ -18,7 +18,7 @@ import type { Session, SessionRun } from "@/lib/store";
 import { validateRun } from "@/lib/validation";
 import { generateId, formatTime, pctColor } from "@/lib/utils";
 import { useBle, useShotData } from "@/lib/useBle";
-import type { ShotData } from "@/lib/ble";
+import type { ShotData } from "@/lib/timer";
 import {
   loadPlan,
   loadPlanProgress,

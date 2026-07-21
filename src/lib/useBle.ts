@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { timer, getLastPairedDevice } from "./ble";
-import type { BleConnectionState, ShotData, TimerEvent } from "./ble";
+import { timer, getLastPairedDevice } from "./timer";
+import type { BleConnectionState, ShotData, TimerEvent } from "./timer";
 
 export function useBle() {
   const [state, setState] = useState<BleConnectionState>("disconnected");

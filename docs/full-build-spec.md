@@ -66,7 +66,7 @@ Capacitor ships the web assets *inside* the app bundle (required for App Store +
 ### A3 — Capacitor iOS project
 
 - `pnpm add @capacitor/core @capacitor/cli @capacitor/ios @capacitor-community/bluetooth-le`
-- `npx cap init` with **appId `com.uspsatrainer.app`** ⛔ (confirm — bundle ids are effectively permanent), appName "USPSA Trainer", `webDir: 'out'`.
+- `npx cap init` with **appId `com.autotrainer.app`**, appName "AutoTrainer" (Charles: "call it autotrainer for now" — note the store listing/bundle id is effectively permanent once published; a rename before first submission is free, after is a new listing), `webDir: 'out'`.
 - `npx cap add ios`. Commit the generated `ios/` project to the repo.
 - `Info.plist`: `NSBluetoothAlwaysUsageDescription` = "Connect to your shot timer to record run times." Portrait lock. Status bar style to match the dark theme.
 - No secrets in the iOS project or Xcode build settings (infra rule).
@@ -109,7 +109,7 @@ Prove *how* the external data is obtained before building anything on it:
 
 - A scheduled job (light periodic ingestion — obeys infra rules: modest, alert-on-failure, no heavy compute on the prod host) pulls external data via the `PopulationSource` impl and reads our-users runs from `uspsa.runs`.
 - Aggregates into percentile times per **(drillId or classifier, classification, distanceYards, fireMode)**: p10/p25/p50/p75/p90 and n.
-- **Privacy gate (principle #4):** emit a cell only when `n >= K` distinct users. `K` value ⛔ (propose K=20; confirm).
+- **Privacy gate (principle #4):** emit a cell only when `n >= K` distinct users. `K` is a configurable constant `POPULATION_MIN_SHOOTERS`, **default 20** (Charles: "make the 20 a variable, but 20 is fine for now").
 - Writes to `uspsa.population_benchmarks` (server-owned; read-only to clients).
 
 ### B2 — Distribution: versioned, cached snapshot
@@ -146,13 +146,17 @@ Parts A and B are largely independent after M2; A can reach TestFlight before B0
 
 ---
 
-## ⛔ Gated decisions for Charles
+## Gated decisions — RESOLVED (2026-07-20)
 
-1. **Bundle id** `com.uspsatrainer.app` — confirm (permanent).
-2. **k-anonymity threshold** `K=20` for publishing a population benchmark — confirm.
-3. **PractiScore vs USPSA** as the external source — decided by the B0 spike; Charles signs off on the method (esp. if scraping).
-4. **Drill categorization** (which drills are population- vs seed-benchmarked) — the proposal Charles reviewed; confirm to lock it into B3.
-5. **PostgREST restart window** for exposing `uspsa` (brief all-apps API blip).
+1. **Bundle id** → `com.autotrainer.app`, app name "AutoTrainer" ("for now").
+2. **k-anonymity threshold** → constant `POPULATION_MIN_SHOOTERS`, default 20.
+3. **External source** → yes, PractiScore/USPSA. **Vision: every competition, live.**
+   Concrete method still decided by the B0 spike; Charles signs off if scraping.
+4. **Drill categorization** → LOCKED to the reviewed proposal (Charles delegated:
+   "do whatever is right"). ~3 population-derivable drills + stage-craft; the
+   rest our-users. The agent owns keeping this correct as the corpus grows.
+5. **PostgREST restart** → agent executes at a low-traffic window and verifies
+   all apps recover (Charles delegated: "just do the right thing").
 
 ---
 
