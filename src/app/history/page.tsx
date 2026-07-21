@@ -43,7 +43,7 @@ export default function HistoryPage() {
             return (
               <Link
                 key={session.id}
-                href={isActive ? `/session/active` : `/history/${session.id}`}
+                href={isActive ? `/session/active` : `/history/detail?id=${session.id}`}
                 className="bg-[var(--bg-card)] rounded-xl border border-surface-200 p-3 block hover:border-brand-800"
               >
                 <div className="flex items-center justify-between">

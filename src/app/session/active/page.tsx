@@ -361,7 +361,7 @@ function ActiveSessionPage() {
     endSession(session.id);
     clearPlan();
     clearPlanProgress();
-    router.push(`/history/${session.id}`);
+    router.push(`/history/detail?id=${session.id}`);
   };
 
   if (!mounted || !session) return null;

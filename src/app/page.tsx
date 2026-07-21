@@ -595,7 +595,7 @@ export default function DashboardPage() {
               return (
                 <Link
                   key={session.id}
-                  href={`/history/${session.id}`}
+                  href={`/history/detail?id=${session.id}`}
                   className="flex items-center gap-4 py-3 px-4 rounded-lg transition-all duration-150"
                   style={{ backgroundColor: "transparent" }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.03)")}

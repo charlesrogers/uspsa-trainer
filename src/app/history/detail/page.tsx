@@ -1,7 +1,14 @@
 "use client";
 
+// Session detail. Session ids are runtime, per-user values (not known at build),
+// so this is a single static page that reads the id from the query string —
+// /history/detail?id=<sessionId> — rather than a dynamic route segment, which a
+// static export can't pre-render. useSearchParams requires a Suspense boundary
+// under static export.
+
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   getSessions,
@@ -14,9 +21,8 @@ import {
 import type { Session, SessionRun } from "@/lib/store";
 import { formatDateTime, minutesBetween, formatTime, pctColor } from "@/lib/utils";
 
-export default function SessionDetailPage() {
-  const params = useParams();
-  const id = params.id as string;
+function SessionDetail() {
+  const id = useSearchParams().get("id") ?? "";
   const [session, setSession] = useState<Session | null>(null);
   const [runs, setRuns] = useState<SessionRun[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -43,7 +49,6 @@ export default function SessionDetailPage() {
   const coldRuns = validRuns.filter((r) => r.isCold);
   const warmRuns = validRuns.filter((r) => !r.isCold);
 
-  // Cold vs Warm comparison
   const coldRun = coldRuns.length > 0 ? coldRuns[0] : null;
   const bestWarm =
     warmRuns.length > 0
@@ -226,5 +231,13 @@ export default function SessionDetailPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SessionDetailPage() {
+  return (
+    <Suspense fallback={null}>
+      <SessionDetail />
+    </Suspense>
   );
 }
