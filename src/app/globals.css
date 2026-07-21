@@ -110,6 +110,11 @@ body {
   color: var(--surface-800);
   min-height: 100dvh;
   position: relative;
+  /* Prevent a too-wide child (e.g. the skill graph) from expanding the layout
+     or triggering iOS shrink-to-fit. `clip` (not `hidden`) keeps position:sticky
+     working. Any horizontally-scrolling content must scroll inside its own box. */
+  max-width: 100vw;
+  overflow-x: clip;
 }
 
 /* Subtle radial gradient overlay on body */
