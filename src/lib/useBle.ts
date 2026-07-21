@@ -13,8 +13,9 @@ export function useBle() {
   const [timerRunning, setTimerRunning] = useState(false);
 
   useEffect(() => {
-    const supported = typeof navigator !== "undefined" && "bluetooth" in navigator;
-    setIsSupported(supported);
+    // Ask the active transport, not the browser — on native iOS the Capacitor
+    // backend supports BLE even though navigator.bluetooth doesn't exist.
+    setIsSupported(timer.isSupported());
     setLastDevice(getLastPairedDevice());
     setState(timer.state);
     setDeviceName(timer.deviceName);
